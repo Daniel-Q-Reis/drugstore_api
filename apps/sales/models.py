@@ -9,7 +9,7 @@ class Sale(models.Model):
     """
     customer_name = models.CharField(max_length=200)
     customer_email = models.EmailField(blank=True)
-    customer_phone = models.CharField(max_length=20, blank=True)
+    customer_phone = models.CharField(max_length=200, blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     final_amount = models.DecimalField(max_digits=10, decimal_places=2)

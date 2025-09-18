@@ -103,11 +103,18 @@ class StockItem(models.Model):
         today = timezone.now().date()
         diff = self.expiration_date - today
 
-        if diff <= relativedelta(months=2):
+        # Convert to days for comparison
+        if hasattr(diff, 'days'):
+            diff_days = diff.days
+        else:
+            # If it's already a relativedelta, convert to approximate days
+            diff_days = diff.years * 365 + diff.months * 30 + diff.days
+
+        if diff_days <= 60:  # 2 months
             return 35
-        elif diff <= relativedelta(months=4):
+        elif diff_days <= 120:  # 4 months
             return 25
-        elif diff <= relativedelta(months=6):
+        elif diff_days <= 180:  # 6 months
             return 15
         else:
             return 0
@@ -117,5 +124,6 @@ class StockItem(models.Model):
         """
         Calculate the discounted price based on discount percentage.
         """
-        discount = self.selling_price * (self.discount_percentage / 100)
+        from decimal import Decimal
+        discount = self.selling_price * (Decimal(self.discount_percentage) / Decimal(100))
         return self.selling_price - discount
