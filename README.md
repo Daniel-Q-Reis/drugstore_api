@@ -74,6 +74,66 @@ A comprehensive pharmacy management system API built with Django REST Framework.
    docker-compose exec app python manage.py createsuperuser
    ```
 
+4. Access the application:
+   - API: http://localhost:8000/
+   - Swagger UI: http://localhost:8000/api/v1/schema/swagger-ui/
+   - ReDoc: http://localhost:8000/api/v1/schema/redoc/
+
+### Switching Between Docker and Local Development
+
+To run the application locally without Docker:
+
+1. Make sure you have Python 3.11 and PostgreSQL installed on your system.
+
+2. Create a PostgreSQL database:
+   ```sql
+   CREATE DATABASE pharmacy_db;
+   CREATE USER postgres WITH PASSWORD 'postgres';
+   GRANT ALL PRIVILEGES ON DATABASE pharmacy_db TO postgres;
+   ```
+
+3. Update the `pharmacy_api/settings/development.py` file to use your local PostgreSQL instance:
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'pharmacy_db',
+           'USER': 'postgres',
+           'PASSWORD': 'postgres',
+           'HOST': 'localhost',  # Changed from 'db' to 'localhost'
+           'PORT': '5432',
+       }
+   }
+   ```
+
+4. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
+
+6. Create a superuser:
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+For convenience, you can use the provided scripts:
+- On Windows: `scripts\run_docker.bat` to start with Docker, `scripts\stop_docker.bat` to stop
+- On Unix/Linux/Mac: `scripts/run_docker.sh` to start with Docker, `scripts/stop_docker.sh` to stop
+
+To easily switch between Docker and local development settings:
+- On Windows: `scripts\use_local_settings.bat` to switch to local development, `scripts\use_docker_settings.bat` to switch back to Docker
+- On Unix/Linux/Mac: `scripts/use_local_settings.sh` to switch to local development, `scripts/use_docker_settings.sh` to switch back to Docker
+
 ## API Documentation
 
 Once the server is running, you can access the API documentation:

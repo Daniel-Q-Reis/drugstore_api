@@ -6,7 +6,7 @@ FROM python:3.11-slim as base
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=pharmacy_api.settings.production
+ENV DJANGO_SETTINGS_MODULE=pharmacy_api.settings.development
 
 # Set work directory
 WORKDIR /app
