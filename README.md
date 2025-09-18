@@ -1,64 +1,147 @@
-# Pharma-API: Django Pharmacy Management System
+# Pharmacy API
 
-A comprehensive, robust RESTful API built with Django Rest Framework and PostgreSQL, designed to power a modern pharmacy management system.
+A comprehensive pharmacy management system API built with Django REST Framework.
 
-This project provides real-time inventory control, tracks product expiration dates, and implements an intelligent, automatic promotion engine. It also features advanced reporting for stock value and sales velocity.
+## Features
 
-## Core Features
+- **User Authentication**: JWT-based authentication with custom user model
+- **Product Management**: Complete CRUD operations for brands, categories, products, and stock items
+- **Sales Management**: Create sales with automatic stock updates and discount calculations
+- **Inventory Tracking**: Real-time inventory management with expiration date tracking
+- **Reporting**: Sales summaries, inventory reports, and financial insights
+- **Caching**: Redis-based caching for improved performance
+- **Asynchronous Tasks**: Celery for background processing and scheduled tasks
+- **API Documentation**: Interactive API documentation with Swagger UI and ReDoc
+- **Testing**: Comprehensive test suite with pytest and factory-boy
+- **Code Quality**: Pre-commit hooks with Black, Flake8, and isort
 
--   **Inventory Management**: Full CRUD operations for products, categories, and brands.
--   **Expiration Date Tracking**: Monitors product expiration dates to ensure safety and quality.
--   **Dynamic Pricing & Promotions**: Automatically applies progressive discounts (15%, 25%, 35%) as products approach their expiration dates (90, 60, 30 days).
--   **Advanced Reporting**: Endpoints to calculate the total financial value of the current stock, with filters for category and brand.
--   **Sales Velocity Tracking**: Analyzes sales data to report on how many units of a product were sold in the last 30 and 90 days.
--   **Data Seeding**: A custom management command to populate the database with realistic fake data for development and testing.
--   **Containerized Environment**: Fully containerized with Docker and Docker Compose for a consistent and reproducible setup.
+## Tech Stack
 
-## Technology Stack
+- **Backend**: Django 4.2, Django REST Framework
+- **Database**: PostgreSQL
+- **Authentication**: JWT (djangorestframework-simplejwt)
+- **Caching**: Redis
+- **Background Tasks**: Celery
+- **API Documentation**: drf-spectacular
+- **Testing**: pytest, factory-boy, Faker
+- **Code Quality**: Black, Flake8, isort, pre-commit
+- **Deployment**: Docker, Docker Compose, Gunicorn
 
--   **Backend**: Django, Django Rest Framework
--   **Database**: PostgreSQL
--   **Containerization**: Docker, Docker Compose
--   **Linting & Formatting**: Ruff
--   **Testing**: Pytest
-
-## Getting Started
+## Installation
 
 ### Prerequisites
 
--   Docker
--   Docker Compose
+- Python 3.11
+- Docker and Docker Compose
+- PostgreSQL (if running without Docker)
 
-### Installation & Running
+### Setup
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repository-url>
-    cd pharma-api
-    ```
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd pharmacy_api
+   ```
 
-2.  **Build and run the containers:**
-    This command will build the Django image, start the application and the PostgreSQL database containers.
-    ```bash
-    docker-compose up --build -d
-    ```
+2. Run the setup script:
+   ```bash
+   # On Windows
+   scripts\setup.bat
+   
+   # On Unix/Linux/Mac
+   bash scripts/setup.sh
+   ```
 
-3.  **Apply database migrations:**
-    ```bash
-    docker-compose exec web python manage.py migrate
-    ```
+3. Start the development server:
+   ```bash
+   python manage.py runserver
+   ```
 
-4.  **(Optional) Populate the database with sample data:**
-    ```bash
-    docker-compose exec web python manage.py populate_db
-    ```
+### Using Docker
 
-The API should now be running and accessible at `http://localhost:8000`.
+1. Build and start services:
+   ```bash
+   docker-compose up --build
+   ```
 
-## API Endpoints
+2. Run migrations:
+   ```bash
+   docker-compose exec app python manage.py migrate
+   ```
 
-*(To be added once implemented)*
+3. Create a superuser:
+   ```bash
+   docker-compose exec app python manage.py createsuperuser
+   ```
 
-## Running Tests
+## API Documentation
 
-*(To be added once implemented)*
+Once the server is running, you can access the API documentation:
+
+- **Swagger UI**: http://localhost:8000/api/v1/schema/swagger-ui/
+- **ReDoc**: http://localhost:8000/api/v1/schema/redoc/
+
+## Testing
+
+Run the test suite with pytest:
+```bash
+pytest
+```
+
+Generate a coverage report:
+```bash
+pytest --cov-report=html --cov=.
+```
+
+## Code Quality
+
+Run code quality checks:
+```bash
+# Run all linters
+pre-commit run --all-files
+
+# Or run individually
+black .
+flake8 .
+isort .
+```
+
+## Seeding Data
+
+To seed the database with sample data:
+```bash
+python manage.py seed_db
+```
+
+## Environment Variables
+
+Create a `.env` file based on `.env.example`:
+```bash
+cp .env.example .env
+```
+
+Key variables:
+- `DEBUG`: Set to `True` for development, `False` for production
+- `SECRET_KEY`: Django secret key
+- `DB_*`: Database connection settings
+- `REDIS_URL`: Redis connection URL
+- `CELERY_*`: Celery broker and result backend settings
+
+## Project Structure
+
+```
+pharmacy_api/
+├── apps/
+│   ├── core/          # Core app with management commands
+│   ├── users/         # User management and authentication
+│   ├── products/      # Product and inventory management
+│   ├── sales/         # Sales and transaction management
+│   └── reports/       # Reporting and analytics
+├── pharmacy_api/      # Main project settings and configuration
+├── scripts/           # Setup and utility scripts
+└── requirements.txt   # Python dependencies
+```
+
+## License
+
+This project is licensed under the MIT License.
