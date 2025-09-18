@@ -69,3 +69,9 @@ jobs:
         flake8 .
         black --check .
         isort --check-only .
+
+    - name: Run type checking
+      run: mypy --strict .
+
+    - name: Run security scanning
+      run: bandit -r .

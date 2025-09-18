@@ -1,7 +1,13 @@
+
 import pytest
-from django.contrib.auth import get_user_model
-from apps.products.factories.factories import BrandFactory, CategoryFactory, ProductFactory, StockItemFactory
-from apps.sales.factories.factories import UserFactory, SaleFactory, SaleItemFactory
+
+from apps.products.factories.factories import (
+    BrandFactory,
+    CategoryFactory,
+    ProductFactory,
+    StockItemFactory,
+)
+from apps.sales.factories.factories import SaleFactory, SaleItemFactory, UserFactory
 
 
 @pytest.fixture

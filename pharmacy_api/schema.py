@@ -1,6 +1,5 @@
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.views import SpectacularAPIView
-from rest_framework.response import Response
 
 
 class CustomSpectacularAPIView(SpectacularAPIView):

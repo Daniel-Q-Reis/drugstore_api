@@ -1,27 +1,27 @@
 from django.test import TestCase
 from django.utils import timezone
+
 from dateutil.relativedelta import relativedelta
+
 from apps.products.models import Brand, Category, Product, StockItem
 
 
 class ProductModelTest(TestCase):
     def setUp(self):
         self.brand = Brand.objects.create(
-            name="Test Brand",
-            description="Test brand description"
+            name="Test Brand", description="Test brand description"
         )
-        
+
         self.category = Category.objects.create(
-            name="Test Category",
-            description="Test category description"
+            name="Test Category", description="Test category description"
         )
-        
+
         self.product = Product.objects.create(
             name="Test Product",
             description="Test product description",
             brand=self.brand,
             category=self.category,
-            sku="TEST001"
+            sku="TEST001",
         )
 
     def test_brand_str(self):
@@ -40,7 +40,7 @@ class ProductModelTest(TestCase):
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=timezone.now().date() + relativedelta(months=7)
+            expiration_date=timezone.now().date() + relativedelta(months=7),
         )
         self.assertEqual(str(stock_item), "Test Product - BATCH001")
 
@@ -53,7 +53,7 @@ class ProductModelTest(TestCase):
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=expiration_date
+            expiration_date=expiration_date,
         )
         self.assertEqual(stock_item.discount_percentage, 35)
 
@@ -66,7 +66,7 @@ class ProductModelTest(TestCase):
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=expiration_date
+            expiration_date=expiration_date,
         )
         self.assertEqual(stock_item.discount_percentage, 25)
 
@@ -79,7 +79,7 @@ class ProductModelTest(TestCase):
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=expiration_date
+            expiration_date=expiration_date,
         )
         self.assertEqual(stock_item.discount_percentage, 15)
 
@@ -92,7 +92,7 @@ class ProductModelTest(TestCase):
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=expiration_date
+            expiration_date=expiration_date,
         )
         self.assertEqual(stock_item.discount_percentage, 0)
 
@@ -105,7 +105,7 @@ class ProductModelTest(TestCase):
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=expiration_date
+            expiration_date=expiration_date,
         )
         # 35% of 15.00 = 5.25, so discounted price = 15.00 - 5.25 = 9.75
         self.assertEqual(stock_item.discounted_price, 9.75)

@@ -152,3 +152,6 @@ htmlcov
 # Local development
 *.local
 .local
+
+#context for ia
+ai_context.txt

@@ -5,15 +5,16 @@ class Brand(models.Model):
     """
     Brand model for product manufacturers.
     """
+
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         indexes = [
-            models.Index(fields=['name']),
+            models.Index(fields=["name"]),
         ]
 
     def __str__(self):
@@ -24,15 +25,16 @@ class Category(models.Model):
     """
     Category model for product classification.
     """
+
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         indexes = [
-            models.Index(fields=['name']),
+            models.Index(fields=["name"]),
         ]
 
     def __str__(self):
@@ -43,6 +45,7 @@ class Product(models.Model):
     """
     Product model for items sold in the pharmacy.
     """
+
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, db_index=True)
@@ -52,12 +55,12 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         indexes = [
-            models.Index(fields=['name']),
-            models.Index(fields=['sku']),
-            models.Index(fields=['brand']),
-            models.Index(fields=['category']),
+            models.Index(fields=["name"]),
+            models.Index(fields=["sku"]),
+            models.Index(fields=["brand"]),
+            models.Index(fields=["category"]),
         ]
 
     def __str__(self):
@@ -68,6 +71,7 @@ class StockItem(models.Model):
     """
     StockItem model for tracking inventory.
     """
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE, db_index=True)
     batch_number = models.CharField(max_length=50)
     quantity = models.PositiveIntegerField()
@@ -78,11 +82,11 @@ class StockItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['expiration_date']
+        ordering = ["expiration_date"]
         indexes = [
-            models.Index(fields=['product']),
-            models.Index(fields=['batch_number']),
-            models.Index(fields=['expiration_date']),
+            models.Index(fields=["product"]),
+            models.Index(fields=["batch_number"]),
+            models.Index(fields=["expiration_date"]),
         ]
 
     def __str__(self):
@@ -98,13 +102,13 @@ class StockItem(models.Model):
         0% otherwise
         """
         from django.utils import timezone
-        from dateutil.relativedelta import relativedelta
+
 
         today = timezone.now().date()
         diff = self.expiration_date - today
 
         # Convert to days for comparison
-        if hasattr(diff, 'days'):
+        if hasattr(diff, "days"):
             diff_days = diff.days
         else:
             # If it's already a relativedelta, convert to approximate days
@@ -125,5 +129,8 @@ class StockItem(models.Model):
         Calculate the discounted price based on discount percentage.
         """
         from decimal import Decimal
-        discount = self.selling_price * (Decimal(self.discount_percentage) / Decimal(100))
+
+        discount = self.selling_price * (
+            Decimal(self.discount_percentage) / Decimal(100)
+        )
         return self.selling_price - discount

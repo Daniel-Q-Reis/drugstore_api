@@ -20,3 +20,7 @@ isort>=5.12,<6.0
 pre-commit>=3.3,<4.0
 gunicorn>=20.1,<21.0
 django-filter>=23.2,<24.0
+# Type checking and security scanning tools
+mypy>=1.5,<2.0
+django-stubs>=4.2,<5.0
+bandit>=1.7,<2.0

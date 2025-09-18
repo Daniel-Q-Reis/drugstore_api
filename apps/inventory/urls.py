@@ -1,12 +1,14 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from rest_framework.routers import DefaultRouter
+
 from .views import InventoryViewSet
 
-app_name = 'inventory'
+app_name = "inventory"
 
 router = DefaultRouter()
-router.register(r'inventory', InventoryViewSet)
+router.register(r"inventory", InventoryViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

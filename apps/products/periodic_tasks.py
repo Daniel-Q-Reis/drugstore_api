@@ -1,5 +1,5 @@
 from celery import shared_task
-from celery.schedules import crontab
+
 from .tasks import notify_expiring_products
 
 
