@@ -20,7 +20,7 @@ app.autodiscover_tasks()
 # Periodic tasks configuration
 app.conf.beat_schedule = {
     "daily-expiring-products-check": {
-        "task": "apps.products.periodic_tasks.daily_expiring_products_check",
+        "task": "apps.products.tasks.daily_expiring_products_check",
         "schedule": crontab(hour=9, minute=0),  # Daily at 9:00 AM
     },
 }

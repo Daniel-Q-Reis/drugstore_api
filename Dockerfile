@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Django application
 
 # Base stage
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -24,7 +24,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Final stage
-FROM base as production
+FROM base AS production
 
 # Copy project
 COPY . /app/

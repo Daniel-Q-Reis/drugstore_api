@@ -9,6 +9,7 @@ from faker import Faker
 from apps.products.models import Brand, Category, Product, StockItem
 from apps.sales.models import Sale, SaleItem
 from apps.sales.services import create_sale
+from apps.sales.dtos import SaleCreateDTO, SaleItemDTO
 
 
 class Command(BaseCommand):
@@ -119,7 +120,35 @@ class Command(BaseCommand):
                 )
 
             try:
-                create_sale(customer_data, items_data)
+                # Create SaleItemDTO objects
+                sale_item_dtos = []
+                for item_data in items_data:
+                    # Fetch the stock item to get the selling price
+                    stock_item = StockItem.objects.get(id=item_data["stock_item_id"])
+                    unit_price = stock_item.selling_price
+                    quantity = item_data["quantity"]
+                    total_price = unit_price * quantity
+                    discount_percentage = stock_item.discount_percentage
+
+                    sale_item_dto = SaleItemDTO(
+                        stock_item_id=item_data["stock_item_id"],
+                        quantity=quantity,
+                        unit_price=unit_price,
+                        total_price=total_price,
+                        discount_percentage=discount_percentage
+                    )
+                    sale_item_dtos.append(sale_item_dto)
+
+                # Create SaleCreateDTO object
+                sale_dto = SaleCreateDTO(
+                    customer_name=customer_data["name"],
+                    customer_email=customer_data["email"],
+                    customer_phone=customer_data["phone"],
+                    items=sale_item_dtos
+                )
+
+                # Create the sale using the DTO
+                create_sale(sale_dto, user=None)
             except ValueError as e:
                 self.stdout.write(f"Warning: Could not create sale - {e}")
 

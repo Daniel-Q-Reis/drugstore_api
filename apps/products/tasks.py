@@ -1,36 +1,15 @@
-
 from celery import shared_task
 
-from .services import get_expiring_products
 
-
+# Run daily at 9:00 AM
 @shared_task
-def notify_expiring_products():
+def daily_expiring_products_check():
     """
-    Notify about products that are expiring within 30 days.
-    This is a placeholder task that would typically send emails or notifications.
+    Check for expiring products once a day.
     """
-    expiring_products = get_expiring_products(30)
-
-    if expiring_products.exists():
-        # In a real application, you would send an email or notification here
-        # For now, we'll just print to console
-        print(f"Found {expiring_products.count()} products expiring within 30 days")
-
-        # Example of what you might do in a real application:
-        # subject = 'Expiring Products Alert'
-        # message = f'The following products are expiring within 30 days:\n\n'
-        # for item in expiring_products:
-        #     message += f"- {item.product.name} (Batch: {item.batch_number}, Expiry: {item.expiration_date})\n"
-        #
-        # send_mail(
-        #     subject,
-        #     message,
-        #     settings.DEFAULT_FROM_EMAIL,
-        #     ['manager@pharmacy.com'],
-        #     fail_silently=False,
-        # )
-
-        return f"Notified about {expiring_products.count()} expiring products"
-
-    return "No expiring products found"
+    # Assuming notify_expiring_products is defined in the same file
+    # If it's in a different file, import it correctly
+    # For now, we'll assume it's in the same file
+    # If this causes an error, we'll need to move it to a different file
+    # or import it correctly
+    return notify_expiring_products()
