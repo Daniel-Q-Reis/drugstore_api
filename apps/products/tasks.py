@@ -1,4 +1,5 @@
 from celery import shared_task
+from .services import notify_expiring_products
 
 
 # Run daily at 9:00 AM
