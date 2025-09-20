@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from typing import Any, Dict, List
+from typing import Any, Dict
 from .dtos import SaleCreateDTO, SaleItemDTO
 from .models import Sale, SaleItem
 
@@ -57,16 +57,21 @@ class SaleCreateSerializer(serializers.ModelSerializer):
             SaleItemDTO(
                 stock_item_id=item["stock_item"].id,
                 quantity=item["quantity"],
-                unit_price=item["stock_item"].selling_price,  # Will be recalculated in service
-                total_price=item["stock_item"].selling_price * item["quantity"],  # Will be recalculated in service
-                discount_percentage=item["stock_item"].discount_percentage  # Will be recalculated in service
+                unit_price=item[
+                    "stock_item"
+                ].selling_price,  # Will be recalculated in service
+                total_price=item["stock_item"].selling_price
+                * item["quantity"],  # Will be recalculated in service
+                discount_percentage=item[
+                    "stock_item"
+                ].discount_percentage,  # Will be recalculated in service
             )
             for item in items_data
         ]
-        
+
         return SaleCreateDTO(
             customer_name=validated_data["customer_name"],
             customer_email=validated_data["customer_email"],
             customer_phone=validated_data["customer_phone"],
-            items=sale_items
+            items=sale_items,
         )

@@ -1,9 +1,10 @@
+from typing import Optional, Dict, Any
+from datetime import date
 from decimal import Decimal
-from typing import Optional
 from django.db import transaction
-from django.contrib.auth.models import User
 
 from apps.products.models import StockItem
+from apps.users.models import User
 
 from .dtos import SaleCreateDTO
 from .models import Sale, SaleItem
@@ -26,15 +27,19 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
         Exception: For any other database errors
     """
     # Calculate totals
-    total_amount: Decimal = Decimal('0.00')
-    discount_amount: Decimal = Decimal('0.00')
+    total_amount: Decimal = Decimal("0.00")
+    discount_amount: Decimal = Decimal("0.00")
 
     # Validate stock availability and calculate prices
     for item_dto in sale_dto.items:
         try:
-            stock_item = StockItem.objects.select_for_update().get(id=item_dto.stock_item_id)
+            stock_item = StockItem.objects.select_for_update().get(
+                id=item_dto.stock_item_id
+            )
         except StockItem.DoesNotExist:
-            raise ValueError(f"Stock item with id {item_dto.stock_item_id} does not exist")
+            raise ValueError(
+                f"Stock item with id {item_dto.stock_item_id} does not exist"
+            )
 
         if stock_item.quantity < item_dto.quantity:
             raise ValueError(f"Insufficient stock for {stock_item.product.name}")
@@ -47,7 +52,7 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
         # Update the DTO with calculated values
         item_dto.unit_price = unit_price
         item_dto.total_price = item_total
-        item_dto.discount_percentage = stock_item.discount_percentage
+        item_dto.discount_percentage = Decimal(str(stock_item.discount_percentage))
 
         total_amount += item_total
         discount_amount += discount
@@ -67,7 +72,9 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
     sale_items = []
     for item_dto in sale_dto.items:
         # Update stock quantity
-        stock_item = StockItem.objects.select_for_update().get(id=item_dto.stock_item_id)
+        stock_item = StockItem.objects.select_for_update().get(
+            id=item_dto.stock_item_id
+        )
         stock_item.quantity -= item_dto.quantity
         stock_item.save(update_fields=["quantity"])
 
@@ -88,7 +95,9 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
     return sale
 
 
-def get_sales_report(start_date=None, end_date=None):
+def get_sales_report(
+    start_date: Optional[date] = None, end_date: Optional[date] = None
+) -> Dict[str, Any]:
     """
     Generate a sales report for a given period.
 

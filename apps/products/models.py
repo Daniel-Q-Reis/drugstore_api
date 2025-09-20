@@ -1,10 +1,11 @@
 from django.db import models
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 
 
 class Brand(models.Model):
-    """
-    Brand model for product manufacturers.
-    """
+    """Brand model for product manufacturers."""
 
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -17,14 +18,12 @@ class Brand(models.Model):
             models.Index(fields=["name"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Category(models.Model):
-    """
-    Category model for product classification.
-    """
+    """Category model for product classification."""
 
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -37,14 +36,12 @@ class Category(models.Model):
             models.Index(fields=["name"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class Product(models.Model):
-    """
-    Product model for items sold in the pharmacy.
-    """
+    """Product model for items sold in the pharmacy."""
 
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -63,14 +60,12 @@ class Product(models.Model):
             models.Index(fields=["category"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.sku})"
 
 
 class StockItem(models.Model):
-    """
-    StockItem model for tracking inventory.
-    """
+    """StockItem model for tracking inventory."""
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, db_index=True)
     batch_number = models.CharField(max_length=50)
@@ -89,11 +84,11 @@ class StockItem(models.Model):
             models.Index(fields=["expiration_date"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.product.name} - {self.batch_number}"
 
     @property
-    def discount_percentage(self):
+    def discount_percentage(self) -> int:
         """
         Calculate discount percentage based on expiration date.
         35% if expires in 2 months or less
@@ -101,35 +96,33 @@ class StockItem(models.Model):
         15% if expires in 5-6 months
         0% otherwise
         """
-        from django.utils import timezone
-
-
         today = timezone.now().date()
-        diff = self.expiration_date - today
+        diff: relativedelta = relativedelta()
 
-        # Convert to days for comparison
-        if hasattr(diff, "days"):
-            diff_days = diff.days
-        else:
-            # If it's already a relativedelta, convert to approximate days
-            diff_days = diff.years * 365 + diff.months * 30 + diff.days
+        # Calculate the difference using relativedelta for accurate month calculation
+        try:
+            diff = relativedelta(self.expiration_date, today)
+        except Exception:
+            # Fallback if there's an issue with relativedelta
+            return 0
 
-        if diff_days <= 60:  # 2 months
+        # Calculate total months difference
+        total_months = diff.years * 12 + diff.months
+
+        if total_months <= 2:
             return 35
-        elif diff_days <= 120:  # 4 months
+        elif total_months <= 4:
             return 25
-        elif diff_days <= 180:  # 6 months
+        elif total_months <= 6:
             return 15
         else:
             return 0
 
     @property
-    def discounted_price(self):
+    def discounted_price(self) -> Decimal:
         """
         Calculate the discounted price based on discount percentage.
         """
-        from decimal import Decimal
-
         discount = self.selling_price * (
             Decimal(self.discount_percentage) / Decimal(100)
         )

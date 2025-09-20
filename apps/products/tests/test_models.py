@@ -7,7 +7,7 @@ from apps.products.models import Brand, Category, Product, StockItem
 
 
 class ProductModelTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.brand = Brand.objects.create(
             name="Test Brand", description="Test brand description"
         )
@@ -24,16 +24,16 @@ class ProductModelTest(TestCase):
             sku="TEST001",
         )
 
-    def test_brand_str(self):
+    def test_brand_str(self) -> None:
         self.assertEqual(str(self.brand), "Test Brand")
 
-    def test_category_str(self):
+    def test_category_str(self) -> None:
         self.assertEqual(str(self.category), "Test Category")
 
-    def test_product_str(self):
+    def test_product_str(self) -> None:
         self.assertEqual(str(self.product), "Test Product (TEST001)")
 
-    def test_stock_item_str(self):
+    def test_stock_item_str(self) -> None:
         stock_item = StockItem.objects.create(
             product=self.product,
             batch_number="BATCH001",
@@ -44,7 +44,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(str(stock_item), "Test Product - BATCH001")
 
-    def test_discount_percentage_35(self):
+    def test_discount_percentage_35(self) -> None:
         # Expires in 1 month
         expiration_date = timezone.now().date() + relativedelta(months=1)
         stock_item = StockItem.objects.create(
@@ -57,7 +57,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(stock_item.discount_percentage, 35)
 
-    def test_discount_percentage_25(self):
+    def test_discount_percentage_25(self) -> None:
         # Expires in 3 months
         expiration_date = timezone.now().date() + relativedelta(months=3)
         stock_item = StockItem.objects.create(
@@ -70,7 +70,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(stock_item.discount_percentage, 25)
 
-    def test_discount_percentage_15(self):
+    def test_discount_percentage_15(self) -> None:
         # Expires in 5 months
         expiration_date = timezone.now().date() + relativedelta(months=5)
         stock_item = StockItem.objects.create(
@@ -83,7 +83,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(stock_item.discount_percentage, 15)
 
-    def test_discount_percentage_0(self):
+    def test_discount_percentage_0(self) -> None:
         # Expires in 7 months
         expiration_date = timezone.now().date() + relativedelta(months=7)
         stock_item = StockItem.objects.create(
@@ -96,7 +96,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(stock_item.discount_percentage, 0)
 
-    def test_discounted_price(self):
+    def test_discounted_price(self) -> None:
         # Expires in 1 month (35% discount)
         expiration_date = timezone.now().date() + relativedelta(months=1)
         stock_item = StockItem.objects.create(

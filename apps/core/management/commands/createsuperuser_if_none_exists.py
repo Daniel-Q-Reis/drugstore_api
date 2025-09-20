@@ -1,16 +1,17 @@
+from typing import Any
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 
 
 class Command(BaseCommand):
     help = "Create a superuser if one does not exist"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("--username", type=str, help="Superuser username")
         parser.add_argument("--email", type=str, help="Superuser email")
         parser.add_argument("--password", type=str, help="Superuser password")
 
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         User = get_user_model()
 
         # Check if a superuser already exists
