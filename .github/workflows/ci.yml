@@ -45,6 +45,7 @@ jobs:
     - name: Run migrations
       run: python manage.py migrate
       env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DB_HOST: localhost
         DB_NAME: test_pharmacy_db
         DB_USER: postgres
@@ -56,6 +57,7 @@ jobs:
     - name: Run tests
       run: pytest
       env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DB_HOST: localhost
         DB_NAME: test_pharmacy_db
         DB_USER: postgres
