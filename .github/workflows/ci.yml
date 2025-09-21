@@ -73,6 +73,12 @@ jobs:
 
     - name: Run type checking
       run: mypy --strict .
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DB_HOST: "localhost"
+        DB_NAME: "test_db"
+        DB_USER: "test_user"
+        DB_PASSWORD: "test_password"
 
     - name: Run security scanning
       run: bandit -r .
