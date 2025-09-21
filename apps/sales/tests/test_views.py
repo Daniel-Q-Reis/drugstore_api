@@ -50,7 +50,7 @@ class TestSaleViewSet:
         """Test successful sale creation."""
         product, stock_item = product_data
 
-        url = reverse("sale-list")
+        url = reverse("sales:sale-list")
         data = {
             "customer_name": "John Doe",
             "customer_email": "john@example.com",
@@ -80,7 +80,7 @@ class TestSaleViewSet:
         """Test sale creation with insufficient stock."""
         product, stock_item = product_data
 
-        url = reverse("sale-list")
+        url = reverse("sales:sale-list")
         data = {
             "customer_name": "John Doe",
             "customer_email": "john@example.com",
@@ -105,7 +105,7 @@ class TestSaleViewSet:
 
     def test_create_sale_invalid_data(self, authenticated_client: APIClient) -> None:
         """Test sale creation with invalid data."""
-        url = reverse("sale-list")
+        url = reverse("sales:sale-list")
         data = {
             "customer_name": "",  # Required field
             "customer_email": "invalid-email",  # Invalid email
@@ -123,7 +123,7 @@ class TestSaleViewSet:
         """Test sale creation without authentication."""
         product, stock_item = product_data
 
-        url = reverse("sale-list")
+        url = reverse("sales:sale-list")
         data = {
             "customer_name": "John Doe",
             "customer_email": "john@example.com",

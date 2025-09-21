@@ -76,10 +76,15 @@ class SaleServiceTest(TestCase):
 
         sale = create_sale(sale_dto, self.user)
 
+        # The stock item expires today, so it should have a 35% discount
+        # Original price: 15.00 * 2 = 30.00
+        # Discount: 35% of 30.00 = 10.50
+        # Final amount: 30.00 - 10.50 = 19.50
+
         self.assertEqual(sale.customer_name, "Test Customer")
         self.assertEqual(sale.total_amount, Decimal("30.00"))
-        self.assertEqual(sale.discount_amount, Decimal("0.00"))
-        self.assertEqual(sale.final_amount, Decimal("30.00"))
+        self.assertEqual(sale.discount_amount, Decimal("10.50"))
+        self.assertEqual(sale.final_amount, Decimal("19.50"))
         self.assertEqual(sale.created_by, self.user)
 
         sale_items = SaleItem.objects.filter(sale=sale)
@@ -88,8 +93,10 @@ class SaleServiceTest(TestCase):
         sale_item = sale_items.first()
         assert sale_item is not None
         self.assertEqual(sale_item.quantity, 2)
-        self.assertEqual(sale_item.unit_price, Decimal("15.00"))
-        self.assertEqual(sale_item.total_price, Decimal("30.00"))
+        # Unit price should be discounted: 15.00 - (15.00 * 0.35) = 9.75
+        self.assertEqual(sale_item.unit_price, Decimal("9.75"))
+        # Total price should be discounted: 9.75 * 2 = 19.50
+        self.assertEqual(sale_item.total_price, Decimal("19.50"))
 
         self.stock_item.refresh_from_db()
         self.assertEqual(self.stock_item.quantity, 98)
@@ -167,6 +174,12 @@ class SaleServiceTest(TestCase):
 
         report = get_sales_report()
 
+        # Each sale has 2 items at 15.00 each = 30.00 total
+        # With 35% discount = 10.50 discount
+        # Final amount per sale = 19.50
+        # Total revenue for 2 sales = 39.00
+        # Average sale value = 19.50
+
         self.assertEqual(report["total_sales"], 2)
-        self.assertEqual(report["total_revenue"], 60.0)
-        self.assertEqual(report["average_sale_value"], 30.0)
+        self.assertEqual(report["total_revenue"], 39.0)
+        self.assertEqual(report["average_sale_value"], 19.5)

@@ -1,9 +1,11 @@
+from decimal import Decimal
 from django.test import TestCase
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
 
 from apps.products.models import Brand, Category, Product, StockItem
+import pytest
 
 
 class ProductModelTest(TestCase):
@@ -44,57 +46,28 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(str(stock_item), "Test Product - BATCH001")
 
-    def test_discount_percentage_35(self) -> None:
-        # Expires in 1 month
-        expiration_date = timezone.now().date() + relativedelta(months=1)
+    @pytest.mark.parametrize(
+        "months_ahead,expected_discount,description",
+        [
+            (1, 35, "Expires in 1 month (35% discount)"),
+            (3, 25, "Expires in 3 months (25% discount)"),
+            (5, 15, "Expires in 5 months (15% discount)"),
+            (7, 0, "Expires in 7 months (0% discount)"),
+        ],
+    )
+    def test_discount_percentage(
+        self, months_ahead: int, expected_discount: int, description: str
+    ) -> None:
+        expiration_date = timezone.now().date() + relativedelta(months=months_ahead)
         stock_item = StockItem.objects.create(
             product=self.product,
-            batch_number="BATCH001",
+            batch_number=f"BATCH{months_ahead:03d}",
             quantity=100,
             cost_price=10.00,
             selling_price=15.00,
             expiration_date=expiration_date,
         )
-        self.assertEqual(stock_item.discount_percentage, 35)
-
-    def test_discount_percentage_25(self) -> None:
-        # Expires in 3 months
-        expiration_date = timezone.now().date() + relativedelta(months=3)
-        stock_item = StockItem.objects.create(
-            product=self.product,
-            batch_number="BATCH002",
-            quantity=100,
-            cost_price=10.00,
-            selling_price=15.00,
-            expiration_date=expiration_date,
-        )
-        self.assertEqual(stock_item.discount_percentage, 25)
-
-    def test_discount_percentage_15(self) -> None:
-        # Expires in 5 months
-        expiration_date = timezone.now().date() + relativedelta(months=5)
-        stock_item = StockItem.objects.create(
-            product=self.product,
-            batch_number="BATCH003",
-            quantity=100,
-            cost_price=10.00,
-            selling_price=15.00,
-            expiration_date=expiration_date,
-        )
-        self.assertEqual(stock_item.discount_percentage, 15)
-
-    def test_discount_percentage_0(self) -> None:
-        # Expires in 7 months
-        expiration_date = timezone.now().date() + relativedelta(months=7)
-        stock_item = StockItem.objects.create(
-            product=self.product,
-            batch_number="BATCH004",
-            quantity=100,
-            cost_price=10.00,
-            selling_price=15.00,
-            expiration_date=expiration_date,
-        )
-        self.assertEqual(stock_item.discount_percentage, 0)
+        self.assertEqual(stock_item.discount_percentage, expected_discount, description)
 
     def test_discounted_price(self) -> None:
         # Expires in 1 month (35% discount)
@@ -108,4 +81,4 @@ class ProductModelTest(TestCase):
             expiration_date=expiration_date,
         )
         # 35% of 15.00 = 5.25, so discounted price = 15.00 - 5.25 = 9.75
-        self.assertEqual(stock_item.discounted_price, 9.75)
+        self.assertEqual(stock_item.discounted_price, Decimal("9.75"))

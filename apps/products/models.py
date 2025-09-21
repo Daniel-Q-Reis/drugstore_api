@@ -122,7 +122,7 @@ class StockItem(models.Model):
         """
         Calculate the discounted price based on discount percentage.
         """
-        discount = self.selling_price * (
+        discount = Decimal(self.selling_price) * (
             Decimal(self.discount_percentage) / Decimal(100)
         )
-        return self.selling_price - discount
+        return Decimal(self.selling_price) - discount
