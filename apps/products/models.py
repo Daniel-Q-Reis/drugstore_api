@@ -1,11 +1,13 @@
+from decimal import Decimal
+
 from django.db import models
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
-from decimal import Decimal
 
 
 class Brand(models.Model):
-    """Brand model for product manufacturers."""
+    """
+    Brand model for product manufacturers.
+    """
 
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -23,7 +25,9 @@ class Brand(models.Model):
 
 
 class Category(models.Model):
-    """Category model for product classification."""
+    """
+    Category model for product classification.
+    """
 
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
@@ -41,7 +45,9 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    """Product model for items sold in the pharmacy."""
+    """
+    Product model for items sold in the pharmacy.
+    """
 
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -65,7 +71,9 @@ class Product(models.Model):
 
 
 class StockItem(models.Model):
-    """StockItem model for tracking inventory."""
+    """
+    StockItem model for tracking inventory.
+    """
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, db_index=True)
     batch_number = models.CharField(max_length=50)
@@ -97,23 +105,14 @@ class StockItem(models.Model):
         0% otherwise
         """
         today = timezone.now().date()
-        diff: relativedelta = relativedelta()
+        diff = self.expiration_date - today
+        diff_days = diff.days
 
-        # Calculate the difference using relativedelta for accurate month calculation
-        try:
-            diff = relativedelta(self.expiration_date, today)
-        except Exception:
-            # Fallback if there's an issue with relativedelta
-            return 0
-
-        # Calculate total months difference
-        total_months = diff.years * 12 + diff.months
-
-        if total_months <= 2:
+        if diff_days <= 60:  # 2 months
             return 35
-        elif total_months <= 4:
+        elif diff_days <= 120:  # 4 months
             return 25
-        elif total_months <= 6:
+        elif diff_days <= 180:  # 6 months
             return 15
         else:
             return 0

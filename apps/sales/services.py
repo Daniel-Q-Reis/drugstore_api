@@ -1,6 +1,7 @@
-from typing import Optional, Dict, Any
 from datetime import date
 from decimal import Decimal
+from typing import Any, Dict, Optional
+
 from django.db import transaction
 
 from apps.products.models import StockItem
@@ -16,21 +17,18 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
     Create a sale with multiple items, updating stock quantities.
 
     Args:
-        sale_dto (SaleCreateDTO): Data transfer object containing sale information
-        user (User, optional): User creating the sale
+        sale_dto: Data transfer object containing sale information.
+        user: The user creating the sale.
 
     Returns:
-        Sale: The created sale object
+        The created sale object.
 
     Raises:
-        ValueError: If stock is insufficient or data is invalid
-        Exception: For any other database errors
+        ValueError: If stock is insufficient or data is invalid.
     """
-    # Calculate totals
-    total_amount: Decimal = Decimal("0.00")
-    discount_amount: Decimal = Decimal("0.00")
+    total_amount_gross = Decimal("0.00")
+    total_discount_amount = Decimal("0.00")
 
-    # Validate stock availability and calculate prices
     for item_dto in sale_dto.items:
         try:
             stock_item = StockItem.objects.select_for_update().get(
@@ -44,41 +42,38 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
         if stock_item.quantity < item_dto.quantity:
             raise ValueError(f"Insufficient stock for {stock_item.product.name}")
 
-        # Calculate item price with discount
-        unit_price = stock_item.discounted_price
-        item_total = unit_price * item_dto.quantity
-        discount = (stock_item.selling_price - unit_price) * item_dto.quantity
+        original_price = stock_item.selling_price
+        discounted_price = stock_item.discounted_price
 
-        # Update the DTO with calculated values
-        item_dto.unit_price = unit_price
-        item_dto.total_price = item_total
+        item_gross_total = original_price * item_dto.quantity
+        item_final_total = discounted_price * item_dto.quantity
+        item_discount = item_gross_total - item_final_total
+
+        item_dto.unit_price = discounted_price
+        item_dto.total_price = item_final_total
         item_dto.discount_percentage = Decimal(str(stock_item.discount_percentage))
 
-        total_amount += item_total
-        discount_amount += discount
+        total_amount_gross += item_gross_total
+        total_discount_amount += item_discount
 
-    # Create the sale
+    final_amount = total_amount_gross - total_discount_amount
+
     sale = Sale.objects.create(
         customer_name=sale_dto.customer_name,
         customer_email=sale_dto.customer_email,
         customer_phone=sale_dto.customer_phone,
-        total_amount=total_amount,
-        discount_amount=discount_amount,
-        final_amount=total_amount - discount_amount,
+        total_amount=total_amount_gross,
+        discount_amount=total_discount_amount,
+        final_amount=final_amount,
         created_by=user,
     )
 
-    # Create sale items and update stock
-    sale_items = []
+    sale_items_to_create = []
     for item_dto in sale_dto.items:
-        # Update stock quantity
-        stock_item = StockItem.objects.select_for_update().get(
-            id=item_dto.stock_item_id
-        )
+        stock_item = StockItem.objects.get(id=item_dto.stock_item_id)
         stock_item.quantity -= item_dto.quantity
         stock_item.save(update_fields=["quantity"])
 
-        # Create sale item
         sale_item = SaleItem(
             sale=sale,
             stock_item=stock_item,
@@ -87,10 +82,9 @@ def create_sale(sale_dto: SaleCreateDTO, user: Optional[User] = None) -> Sale:
             discount_percentage=item_dto.discount_percentage,
             total_price=item_dto.total_price,
         )
-        sale_items.append(sale_item)
+        sale_items_to_create.append(sale_item)
 
-    # Bulk create all sale items
-    SaleItem.objects.bulk_create(sale_items)
+    SaleItem.objects.bulk_create(sale_items_to_create)
 
     return sale
 
@@ -102,11 +96,11 @@ def get_sales_report(
     Generate a sales report for a given period.
 
     Args:
-        start_date (date): Start date for the report
-        end_date (date): End date for the report
+        start_date: Start date for the report.
+        end_date: End date for the report.
 
     Returns:
-        dict: Sales report data
+        A dictionary containing sales report data.
     """
     sales = Sale.objects.all()
 
@@ -117,7 +111,7 @@ def get_sales_report(
         sales = sales.filter(created_at__date__lte=end_date)
 
     total_sales = sales.count()
-    total_revenue = sum(sale.final_amount for sale in sales)
+    total_revenue = sum(sale.final_amount for sale in sales if sale.final_amount)
 
     return {
         "total_sales": total_sales,

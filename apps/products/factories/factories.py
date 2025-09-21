@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils import timezone
 
 import factory
@@ -43,7 +44,7 @@ class StockItemFactory(factory.django.DjangoModelFactory):
     cost_price = factory.Faker(
         "pydecimal", left_digits=4, right_digits=2, positive=True
     )
-    selling_price = factory.LazyAttribute(lambda obj: obj.cost_price * 1.5)
+    selling_price = factory.LazyAttribute(lambda obj: obj.cost_price * Decimal("1.5"))
     expiration_date = factory.LazyFunction(
         lambda: timezone.now().date() + relativedelta(months=6)
     )
