@@ -1,191 +1,151 @@
 # Pharmacy API
 
-A comprehensive pharmacy management system API built with Django REST Framework.
+A comprehensive pharmacy management system API built with Django REST Framework, designed with enterprise-level standards for quality, security, and maintainability.
 
 ## Features
 
-- **User Authentication**: JWT-based authentication with custom user model
-- **Product Management**: Complete CRUD operations for brands, categories, products, and stock items
-- **Sales Management**: Create sales with automatic stock updates and discount calculations
-- **Inventory Tracking**: Real-time inventory management with expiration date tracking
-- **Reporting**: Sales summaries, inventory reports, and financial insights
-- **Caching**: Redis-based caching for improved performance
-- **Asynchronous Tasks**: Celery for background processing and scheduled tasks
-- **API Documentation**: Interactive API documentation with Swagger UI and ReDoc
-- **Testing**: Comprehensive test suite with pytest and factory-boy
-- **Code Quality**: Pre-commit hooks with Black, Flake8, and isort
+- **Robust Architecture**: Built on Clean Architecture principles with a dedicated Service Layer and Data Transfer Objects (DTOs) to ensure separation of concerns.
+- **User Authentication**: Secure JWT-based authentication with a custom user model.
+- **Product Management**: Complete CRUD for brands, categories, products, and stock items.
+- **Sales Management**: Transactional sales creation with automatic stock updates and dynamic discount calculations.
+- **Inventory Tracking**: Real-time inventory management with expiration date tracking.
+- **Advanced Reporting**: Endpoints for sales summaries, inventory value, and financial insights.
+- **High Performance**: Caching strategies with Redis to optimize frequent queries.
+- **Asynchronous Tasks**: Celery and Redis for handling background processes and scheduled tasks.
+- **Comprehensive Testing**: Full test suite covering unit, integration, and service layers using `pytest` and `factory-boy`.
+- **Automated Quality & Security**: CI/CD pipeline with GitHub Actions that runs linters (`ruff`), static type checking (`mypy --strict`), and security scanning (`bandit`).
+- **Interactive API Documentation**: Auto-generated, interactive API documentation with Swagger UI and ReDoc via `drf-spectacular`.
 
 ## Tech Stack
 
 - **Backend**: Django 4.2, Django REST Framework
 - **Database**: PostgreSQL
 - **Authentication**: JWT (djangorestframework-simplejwt)
-- **Caching**: Redis
+- **Caching & Task Queues**: Redis
 - **Background Tasks**: Celery
 - **API Documentation**: drf-spectacular
 - **Testing**: pytest, factory-boy, Faker
-- **Code Quality**: Black, Flake8, isort, pre-commit
+- **Code Quality**: `black`, `ruff`, `mypy`, `pre-commit`, `bandit`
 - **Deployment**: Docker, Docker Compose, Gunicorn
 
-## Installation
+---
+
+## 🚀 Getting Started with Docker
+
+This is the recommended method for running the project, as it provides a consistent environment.
 
 ### Prerequisites
 
-- Python 3.11
-- Docker and Docker Compose
-- PostgreSQL (if running without Docker)
+- Docker
+- Docker Compose
 
-### Setup
+### Automated Setup (Recommended)
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd pharmacy_api
-   ```
+A single script will build the containers, run database migrations, create a default superuser, and seed the database with sample data.
 
-2. Run the setup script:
-   ```bash
-   # On Windows
-   scripts\setup.bat
-   
-   # On Unix/Linux/Mac
-   bash scripts/setup.sh
-   ```
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd pharmacy_api
+    ```
 
-3. Start the development server:
-   ```bash
-   python manage.py runserver
-   ```
+2.  **Create your local environment file:**
+    ```bash
+    cp .env.example .env
+    ```
+    *(You can customize variables inside `.env` if needed, but the defaults work out-of-the-box.)*
 
-### Using Docker
+3.  **Run the setup script:**
+    -   On **Unix/Linux/Mac**:
+        ```bash
+        scripts/run_docker.sh
+        ```
+    -   On **Windows**:
+        ```bat
+        scripts\run_docker.bat
+        ```
 
-1. Build and start services:
-   ```bash
-   docker-compose up --build
-   ```
+This process will execute the `setup_project` command, which:
+-   Applies all database migrations.
+-   Creates a default superuser.
+    -   **Username**: `admin`
+    -   **Email**: `admin@example.com`
+    -   **Password**: `admin123`
+-   Seeds the database with a generous amount of sample data. To run the setup *without* seeding the database, execute: `docker-compose exec app python manage.py setup_project --no-seed`
 
-2. Run migrations:
-   ```bash
-   docker-compose exec app python manage.py migrate
-   ```
+### Manual Setup (For More Control)
 
-3. Create a superuser:
-   ```bash
-   docker-compose exec app python manage.py createsuperuser
-   ```
+If you prefer to run each step manually:
 
-4. Access the application:
-   - API: http://localhost:8000/
-   - Swagger UI: http://localhost:8000/api/v1/schema/swagger-ui/
-   - ReDoc: http://localhost:8000/api/v1/schema/redoc/
+1.  **Build and start the services:**
+    ```bash
+    docker-compose up --build -d
+    ```
+2.  **Run migrations:**
+    ```bash
+    docker-compose exec app python manage.py migrate
+    ```
+3.  **Create a superuser:**
+    ```bash
+    docker-compose exec app python manage.py createsuperuser_if_none_exists
+    ```
+4.  **(Optional) Seed the database:**
+    ```bash
+    docker-compose exec app python manage.py seed_db
+    ```
 
-### Switching Between Docker and Local Development
+### Accessing the Application
 
-To run the application locally without Docker:
+Once the application is running, the following endpoints will be available:
 
-1. Make sure you have Python 3.11 and PostgreSQL installed on your system.
+-   **Django Admin**: `http://localhost:8000/admin`
+    -   *Login with the superuser credentials (`admin@example.com` / `admin123`)*.
 
-2. Create a PostgreSQL database:
-   ```sql
-   CREATE DATABASE pharmacy_db;
-   CREATE USER postgres WITH PASSWORD 'postgres';
-   GRANT ALL PRIVILEGES ON DATABASE pharmacy_db TO postgres;
-   ```
+-   **API Documentation (Swagger UI)**: `http://localhost:8000/api/v1/schema/swagger-ui/`
+    -   *The best place to explore and test the API endpoints interactively.*
 
-3. Update the `pharmacy_api/settings/development.py` file to use your local PostgreSQL instance:
-   ```python
-   DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'pharmacy_db',
-           'USER': 'postgres',
-           'PASSWORD': 'postgres',
-           'HOST': 'localhost',  # Changed from 'db' to 'localhost'
-           'PORT': '5432',
-       }
-   }
-   ```
+-   **API Documentation (ReDoc)**: `http://localhost:8000/api/v1/schema/redoc/`
+    -   *Alternative documentation view.*
 
-4. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+-   **API Base Path**: `http://localhost:8000/api/v1/`
+    -   *Note: This is the base prefix for all API endpoints (e.g., `/api/v1/products/`, `/api/v1/sales/`). It does not have a user interface and will show a 404 error if accessed directly in a browser.*
 
-5. Run migrations:
-   ```bash
-   python manage.py migrate
-   ```
+To shut down the services, run: `docker-compose down`. For a clean shutdown that also removes the database volume, use `docker-compose down -v`.
 
-6. Create a superuser:
-   ```bash
-   python manage.py createsuperuser
-   ```
+---
 
-7. Start the development server:
-   ```bash
-   python manage.py runserver
-   ```
+## 🧪 Testing & Code Quality
 
-For convenience, you can use the provided scripts:
-- On Windows: `scripts\run_docker.bat` to start with Docker, `scripts\stop_docker.bat` to stop
-- On Unix/Linux/Mac: `scripts/run_docker.sh` to start with Docker, `scripts/stop_docker.sh` to stop
+This project is configured with a strict set of quality gates to ensure code is reliable and maintainable.
 
-To easily switch between Docker and local development settings:
-- On Windows: `scripts\use_local_settings.bat` to switch to local development, `scripts\use_docker_settings.bat` to switch back to Docker
-- On Unix/Linux/Mac: `scripts/use_local_settings.sh` to switch to local development, `scripts/use_docker_settings.sh` to switch back to Docker
+### Running Tests
 
-## API Documentation
+Execute the entire test suite with `pytest`:
 
-Once the server is running, you can access the API documentation:
-
-- **Swagger UI**: http://localhost:8000/api/v1/schema/swagger-ui/
-- **ReDoc**: http://localhost:8000/api/v1/schema/redoc/
-
-## Testing
-
-Run the test suite with pytest:
 ```bash
 pytest
 ```
+To generate a detailed coverage report in HTML format:
 
-Generate a coverage report:
 ```bash
-pytest --cov-report=html --cov=.
+pytest --cov=. --cov-report=html
 ```
 
-## Code Quality
+Code Quality Checks
+The project uses pre-commit to automate quality checks before every commit. To run all checks manually across the entire codebase:
 
-Run code quality checks:
 ```bash
-# Run all linters
 pre-commit run --all-files
-
-# Or run individually
-black .
-flake8 .
-isort .
 ```
+This will execute the following tools:
 
-## Seeding Data
+black: For uncompromising code formatting.
 
-To seed the database with sample data:
-```bash
-python manage.py seed_db
-```
+ruff: An extremely fast linter for identifying potential bugs and style issues.
 
-## Environment Variables
+mypy: A static type checker running in strict mode to enforce type safety.
 
-Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
-
-Key variables:
-- `DEBUG`: Set to `True` for development, `False` for production
-- `SECRET_KEY`: Django secret key
-- `DB_*`: Database connection settings
-- `REDIS_URL`: Redis connection URL
-- `CELERY_*`: Celery broker and result backend settings
+bandit: A security scanner to find common security vulnerabilities.
 
 ## Project Structure
 
@@ -202,6 +162,11 @@ pharmacy_api/
 └── requirements.txt   # Python dependencies
 ```
 
-## License
-
+## License & Contact
 This project is licensed under the MIT License.
+
+Author: Daniel de Queiroz Reis
+
+Email: danielqreis@gmail.com
+
+WhatsApp: +55 35 99190-2471
