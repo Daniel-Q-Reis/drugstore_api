@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from decimal import Decimal
 
 from apps.products.models import StockItem
 from apps.products.services import get_expiring_products, get_low_stock_products
@@ -60,8 +61,8 @@ def inventory_value(request: HttpRequest) -> Response:
 
     stock_items = StockItem.objects.all()
 
-    total_cost_value = 0
-    total_selling_value = 0
+    total_cost_value: Decimal = Decimal("0")
+    total_selling_value: Decimal = Decimal("0")
 
     for item in stock_items:
         total_cost_value += item.cost_price * item.quantity

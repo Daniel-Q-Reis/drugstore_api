@@ -8,4 +8,4 @@ from rest_framework.response import Response
 class CustomSpectacularAPIView(SpectacularAPIView):
     @extend_schema(exclude=True)
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        return super().get(request, *args, **kwargs)  # type: ignore[no-untyped-call, no-any-return]
+        return super().get(request, *args, **kwargs)

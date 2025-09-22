@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
+
 from apps.products.factories.factories import (
     BrandFactory,
     CategoryFactory,

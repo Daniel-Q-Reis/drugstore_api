@@ -1,14 +1,13 @@
 from django.utils import timezone
 from django.db.models.query import QuerySet
 from django.db.models.manager import Manager
-from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
 from .models import StockItem
 
 
-def get_expiring_products(days: int = 30) -> QuerySet[StockItem, Manager[Any]]:
+def get_expiring_products(days: int = 30) -> QuerySet[StockItem, Manager[StockItem]]:
     """
     Get products that are expiring within the specified number of days.
 
@@ -24,7 +23,9 @@ def get_expiring_products(days: int = 30) -> QuerySet[StockItem, Manager[Any]]:
     ).select_related("product", "product__brand", "product__category")
 
 
-def get_low_stock_products(threshold: int = 10) -> QuerySet[StockItem, Manager[Any]]:
+def get_low_stock_products(
+    threshold: int = 10,
+) -> QuerySet[StockItem, Manager[StockItem]]:
     """
     Get products with stock below the specified threshold.
 
