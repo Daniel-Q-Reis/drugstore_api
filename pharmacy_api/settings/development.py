@@ -2,7 +2,7 @@ import os
 
 from decouple import config
 
-from .base import *
+from .base import *  # noqa: F403
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # In development, we can use a default value, but it must still come from environment variables

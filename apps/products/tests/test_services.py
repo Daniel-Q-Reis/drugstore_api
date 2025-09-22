@@ -8,7 +8,7 @@ from apps.products.services import get_expiring_products, get_low_stock_products
 
 
 class ProductServiceTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.brand = Brand.objects.create(
             name="Test Brand", description="Test brand description"
         )
@@ -25,37 +25,46 @@ class ProductServiceTest(TestCase):
             sku="TEST001",
         )
 
-        # Create expiring stock item (expires in 15 days)
+        # Create stock items for testing
         self.expiring_stock = StockItem.objects.create(
             product=self.product,
             batch_number="BATCH001",
             quantity=50,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=timezone.now().date() + relativedelta(days=15),
+            expiration_date=timezone.now().date()
+            + relativedelta(days=15),  # Expires in 15 days
         )
 
-        # Create non-expiring stock item (expires in 90 days)
         self.non_expiring_stock = StockItem.objects.create(
             product=self.product,
             batch_number="BATCH002",
+            quantity=100,
+            cost_price=10.00,
+            selling_price=15.00,
+            expiration_date=timezone.now().date()
+            + relativedelta(days=120),  # Expires in 120 days
+        )
+
+        self.expired_stock = StockItem.objects.create(
+            product=self.product,
+            batch_number="BATCH003",
             quantity=30,
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=timezone.now().date() + relativedelta(days=90),
+            expiration_date=timezone.now().date()
+            - relativedelta(days=5),  # Expired 5 days ago
         )
 
-        # Create low stock item
         self.low_stock = StockItem.objects.create(
             product=self.product,
-            batch_number="BATCH003",
+            batch_number="BATCH004",
             quantity=5,  # Below threshold of 10
             cost_price=10.00,
             selling_price=15.00,
-            expiration_date=timezone.now().date() + relativedelta(days=60),
+            expiration_date=timezone.now().date() + relativedelta(days=120),
         )
 
-        # Create normal stock item
         self.normal_stock = StockItem.objects.create(
             product=self.product,
             batch_number="BATCH004",
@@ -65,7 +74,7 @@ class ProductServiceTest(TestCase):
             expiration_date=timezone.now().date() + relativedelta(days=120),
         )
 
-    def test_get_expiring_products(self):
+    def test_get_expiring_products(self) -> None:
         # Get products expiring within 30 days
         expiring_products = get_expiring_products(30)
 
@@ -88,7 +97,7 @@ class ProductServiceTest(TestCase):
         expiring_products = get_expiring_products(30)
         self.assertNotIn(expired_stock, expiring_products)
 
-    def test_get_low_stock_products(self):
+    def test_get_low_stock_products(self) -> None:
         # Get products with stock below threshold of 10
         low_stock_products = get_low_stock_products(10)
 

@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.db import models
+from django.utils import timezone
 
 
 class Brand(models.Model):
@@ -17,7 +20,7 @@ class Brand(models.Model):
             models.Index(fields=["name"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -37,7 +40,7 @@ class Category(models.Model):
             models.Index(fields=["name"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -63,7 +66,7 @@ class Product(models.Model):
             models.Index(fields=["category"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.sku})"
 
 
@@ -89,11 +92,11 @@ class StockItem(models.Model):
             models.Index(fields=["expiration_date"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.product.name} - {self.batch_number}"
 
     @property
-    def discount_percentage(self):
+    def discount_percentage(self) -> int:
         """
         Calculate discount percentage based on expiration date.
         35% if expires in 2 months or less
@@ -101,18 +104,9 @@ class StockItem(models.Model):
         15% if expires in 5-6 months
         0% otherwise
         """
-        from django.utils import timezone
-
-
         today = timezone.now().date()
         diff = self.expiration_date - today
-
-        # Convert to days for comparison
-        if hasattr(diff, "days"):
-            diff_days = diff.days
-        else:
-            # If it's already a relativedelta, convert to approximate days
-            diff_days = diff.years * 365 + diff.months * 30 + diff.days
+        diff_days = diff.days
 
         if diff_days <= 60:  # 2 months
             return 35
@@ -124,13 +118,11 @@ class StockItem(models.Model):
             return 0
 
     @property
-    def discounted_price(self):
+    def discounted_price(self) -> Decimal:
         """
         Calculate the discounted price based on discount percentage.
         """
-        from decimal import Decimal
-
-        discount = self.selling_price * (
+        discount = Decimal(self.selling_price) * (
             Decimal(self.discount_percentage) / Decimal(100)
         )
-        return self.selling_price - discount
+        return Decimal(self.selling_price) - discount

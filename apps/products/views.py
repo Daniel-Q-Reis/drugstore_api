@@ -10,7 +10,7 @@ from .serializers import (
 )
 
 
-class BrandViewSet(viewsets.ModelViewSet):
+class BrandViewSet(viewsets.ModelViewSet[Brand]):
     queryset = Brand.objects.all().order_by("name")
     serializer_class = BrandSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -19,7 +19,7 @@ class BrandViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet[Category]):
     queryset = Category.objects.all().order_by("name")
     serializer_class = CategorySerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -28,7 +28,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet[Product]):
     queryset = (
         Product.objects.select_related("brand", "category").all().order_by("name")
     )
@@ -44,7 +44,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
 
 
-class StockItemViewSet(viewsets.ModelViewSet):
+class StockItemViewSet(viewsets.ModelViewSet[StockItem]):
     queryset = (
         StockItem.objects.select_related(
             "product", "product__brand", "product__category"

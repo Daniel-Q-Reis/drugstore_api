@@ -1,0 +1,28 @@
+# Bandit configuration for the Drugstore API project.
+# For more details, see: https://bandit.readthedocs.io/en/latest/config.html
+
+# We use the global 'skips' directive to ignore low-severity, context-specific
+# issues that are known to be false positives within this project's context.
+#
+# The 'tests' key was intentionally avoided as it is for including/excluding
+# Bandit's internal test plugins, not for managing findings in user-land test code,
+# which proved to be confusing. The 'targets' key also showed inconsistent
+# behavior when used via pre-commit.
+#
+# This 'skips' approach is the most direct and robust solution for this setup.
+skips:
+  - 'B101'  # Skip 'assert_used': This is standard and expected practice in pytest.
+  - 'B106'  # Skip 'hardcoded_password_funcarg': Acceptable for creating test users with dummy passwords.
+  - 'B311'  # Skip 'random': Acceptable for non-cryptographic purposes like generating sample data in the seed_db script.
+
+# For performance, we explicitly exclude non-project directories from the scan.
+exclude_dirs:
+  - 'venv'
+  - '.venv'
+  - tests
+  - .tests
+
+targets:
+  - id: B311
+    paths:
+      - apps/core/management/commands/seed_db.py

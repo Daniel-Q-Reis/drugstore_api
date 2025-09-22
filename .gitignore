@@ -153,5 +153,5 @@ htmlcov
 *.local
 .local
 
-#context for ia
+# context for ia
 ai_context.txt

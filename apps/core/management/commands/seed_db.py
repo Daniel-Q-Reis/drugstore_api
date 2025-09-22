@@ -1,7 +1,10 @@
 import random
+from typing import Any, List
+from decimal import Decimal
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from dateutil.relativedelta import relativedelta
 from faker import Faker
@@ -11,11 +14,13 @@ from apps.sales.models import Sale, SaleItem
 from apps.sales.services import create_sale
 from apps.sales.dtos import SaleCreateDTO, SaleItemDTO
 
+User = get_user_model()
+
 
 class Command(BaseCommand):
     help = "Seed the database with sample data"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
             "--brands", type=int, default=10, help="Number of brands to create"
         )
@@ -35,7 +40,7 @@ class Command(BaseCommand):
             "--sales", type=int, default=30, help="Number of sales to create"
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         fake = Faker()
 
         # Clear existing data
@@ -49,7 +54,7 @@ class Command(BaseCommand):
 
         # Create brands
         self.stdout.write("Creating brands...")
-        brands = []
+        brands: List[Brand] = []
         for i in range(options["brands"]):
             brand = Brand.objects.create(
                 name=fake.company(), description=fake.text(max_nb_chars=200)
@@ -58,7 +63,7 @@ class Command(BaseCommand):
 
         # Create categories
         self.stdout.write("Creating categories...")
-        categories = []
+        categories: List[Category] = []
         for i in range(options["categories"]):
             category = Category.objects.create(
                 name=fake.word().capitalize() + " " + fake.word().capitalize(),
@@ -68,13 +73,13 @@ class Command(BaseCommand):
 
         # Create products
         self.stdout.write("Creating products...")
-        products = []
+        products: List[Product] = []
         for i in range(options["products"]):
             product = Product.objects.create(
                 name=fake.word().capitalize() + " " + fake.word().capitalize(),
                 description=fake.text(max_nb_chars=200),
-                brand=random.choice(brands),
-                category=random.choice(categories),
+                brand=random.choice(brands),  # nosec B311
+                category=random.choice(categories),  # nosec B311
                 sku=fake.unique.ean13(),
             )
             products.append(product)
@@ -84,15 +89,15 @@ class Command(BaseCommand):
         for i in range(options["stock_items"]):
             # Generate expiration date within next 2 years
             expiration_date = timezone.now().date() + relativedelta(
-                months=random.randint(1, 24)
+                months=random.randint(1, 24)  # nosec B311
             )
 
             stock_item = StockItem.objects.create(
-                product=random.choice(products),
+                product=random.choice(products),  # nosec B311
                 batch_number=fake.unique.ean8(),
-                quantity=random.randint(10, 1000),
-                cost_price=random.uniform(5.0, 100.0),
-                selling_price=random.uniform(10.0, 150.0),
+                quantity=random.randint(10, 1000),  # nosec B311
+                cost_price=Decimal(str(random.uniform(5.0, 100.0))),  # nosec B311
+                selling_price=Decimal(str(random.uniform(10.0, 150.0))),  # nosec B311
                 expiration_date=expiration_date,
             )
 
@@ -102,8 +107,8 @@ class Command(BaseCommand):
 
         for i in range(options["sales"]):
             # Select random stock items for this sale
-            num_items = random.randint(1, 5)
-            selected_stock_items = random.sample(
+            num_items = random.randint(1, 5)  # nosec B311
+            selected_stock_items = random.sample(  # nosec B311
                 stock_items, min(num_items, len(stock_items))
             )
 
@@ -116,26 +121,29 @@ class Command(BaseCommand):
             items_data = []
             for stock_item in selected_stock_items:
                 items_data.append(
-                    {"stock_item_id": stock_item.id, "quantity": random.randint(1, 5)}
+                    {
+                        "stock_item_id": stock_item.id,
+                        "quantity": random.randint(1, 5),  # nosec B311
+                    }
                 )
 
             try:
                 # Create SaleItemDTO objects
-                sale_item_dtos = []
+                sale_item_dtos: List[SaleItemDTO] = []
                 for item_data in items_data:
                     # Fetch the stock item to get the selling price
                     stock_item = StockItem.objects.get(id=item_data["stock_item_id"])
                     unit_price = stock_item.selling_price
                     quantity = item_data["quantity"]
                     total_price = unit_price * quantity
-                    discount_percentage = stock_item.discount_percentage
+                    discount_percentage = Decimal(str(stock_item.discount_percentage))
 
                     sale_item_dto = SaleItemDTO(
                         stock_item_id=item_data["stock_item_id"],
                         quantity=quantity,
                         unit_price=unit_price,
                         total_price=total_price,
-                        discount_percentage=discount_percentage
+                        discount_percentage=discount_percentage,
                     )
                     sale_item_dtos.append(sale_item_dto)
 
@@ -144,7 +152,7 @@ class Command(BaseCommand):
                     customer_name=customer_data["name"],
                     customer_email=customer_data["email"],
                     customer_phone=customer_data["phone"],
-                    items=sale_item_dtos
+                    items=sale_item_dtos,
                 )
 
                 # Create the sale using the DTO

@@ -6,10 +6,12 @@ from apps.sales.models import Sale, SaleItem
 
 
 class SaleModelTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         User = get_user_model()
         self.user = User.objects.create_user(
-            email="test@example.com", username="testuser", password="testpass123"
+            email="test@example.com",
+            username="testuser",
+            password="testpass123",  # nosec B106
         )
 
         self.brand = Brand.objects.create(
@@ -37,7 +39,7 @@ class SaleModelTest(TestCase):
             expiration_date="2025-12-31",
         )
 
-    def test_sale_str(self):
+    def test_sale_str(self) -> None:
         sale = Sale.objects.create(
             customer_name="Test Customer",
             total_amount=30.00,
@@ -47,7 +49,7 @@ class SaleModelTest(TestCase):
         )
         self.assertEqual(str(sale), f"Sale #{sale.id} - Test Customer")
 
-    def test_sale_item_str(self):
+    def test_sale_item_str(self) -> None:
         sale = Sale.objects.create(
             customer_name="Test Customer",
             total_amount=30.00,
