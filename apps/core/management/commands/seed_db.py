@@ -78,8 +78,8 @@ class Command(BaseCommand):
             product = Product.objects.create(
                 name=fake.word().capitalize() + " " + fake.word().capitalize(),
                 description=fake.text(max_nb_chars=200),
-                brand=random.choice(brands),
-                category=random.choice(categories),
+                brand=random.choice(brands),  # nosec B311
+                category=random.choice(categories),  # nosec B311
                 sku=fake.unique.ean13(),
             )
             products.append(product)
@@ -89,15 +89,15 @@ class Command(BaseCommand):
         for i in range(options["stock_items"]):
             # Generate expiration date within next 2 years
             expiration_date = timezone.now().date() + relativedelta(
-                months=random.randint(1, 24)
+                months=random.randint(1, 24)  # nosec B311
             )
 
             stock_item = StockItem.objects.create(
-                product=random.choice(products),
+                product=random.choice(products),  # nosec B311
                 batch_number=fake.unique.ean8(),
-                quantity=random.randint(10, 1000),
-                cost_price=Decimal(str(random.uniform(5.0, 100.0))),
-                selling_price=Decimal(str(random.uniform(10.0, 150.0))),
+                quantity=random.randint(10, 1000),  # nosec B311
+                cost_price=Decimal(str(random.uniform(5.0, 100.0))),  # nosec B311
+                selling_price=Decimal(str(random.uniform(10.0, 150.0))),  # nosec B311
                 expiration_date=expiration_date,
             )
 
@@ -107,8 +107,8 @@ class Command(BaseCommand):
 
         for i in range(options["sales"]):
             # Select random stock items for this sale
-            num_items = random.randint(1, 5)
-            selected_stock_items = random.sample(
+            num_items = random.randint(1, 5)  # nosec B311
+            selected_stock_items = random.sample(  # nosec B311
                 stock_items, min(num_items, len(stock_items))
             )
 
@@ -121,7 +121,10 @@ class Command(BaseCommand):
             items_data = []
             for stock_item in selected_stock_items:
                 items_data.append(
-                    {"stock_item_id": stock_item.id, "quantity": random.randint(1, 5)}
+                    {
+                        "stock_item_id": stock_item.id,
+                        "quantity": random.randint(1, 5),
+                    }  # nosec B311
                 )
 
             try:

@@ -9,7 +9,9 @@ class SaleModelTest(TestCase):
     def setUp(self) -> None:
         User = get_user_model()
         self.user = User.objects.create_user(
-            email="test@example.com", username="testuser", password="testpass123"
+            email="test@example.com",
+            username="testuser",
+            password="testpass123",  # nosec B106
         )
 
         self.brand = Brand.objects.create(

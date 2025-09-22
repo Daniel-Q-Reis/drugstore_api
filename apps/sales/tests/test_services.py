@@ -17,7 +17,9 @@ class SaleServiceTest(TestCase):
     def setUp(self) -> None:
         """Set up the necessary objects for the test suite."""
         self.user = User.objects.create_user(
-            email="test@example.com", username="testuser", password="testpass123"
+            email="test@example.com",
+            username="testuser",
+            password="testpass123",  # nosec B106
         )
         self.brand = Brand.objects.create(name="Test Brand")
         self.category = Category.objects.create(name="Test Category")
@@ -91,7 +93,7 @@ class SaleServiceTest(TestCase):
         self.assertEqual(sale_items.count(), 1)
 
         sale_item = sale_items.first()
-        assert sale_item is not None
+        assert sale_item is not None  # nosec B101
         self.assertEqual(sale_item.quantity, 2)
         # Unit price should be discounted: 15.00 - (15.00 * 0.35) = 9.75
         self.assertEqual(sale_item.unit_price, Decimal("9.75"))

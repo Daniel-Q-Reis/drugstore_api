@@ -27,7 +27,9 @@ class TestSaleViewSet:
     def user(self) -> User:
         """Create a test user."""
         return User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123"
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",  # nosec B106
         )
 
     @pytest.fixture
@@ -62,18 +64,18 @@ class TestSaleViewSet:
         response = authenticated_client.post(url, data, format="json")
 
         # Check that the response is successful
-        assert response.status_code == status.HTTP_201_CREATED
+        assert response.status_code == status.HTTP_201_CREATED  # nosec B101
 
         # Check that the response contains the expected data
-        assert response.data["customer_name"] == "John Doe"
-        assert response.data["customer_email"] == "john@example.com"
-        assert response.data["customer_phone"] == "+1234567890"
-        assert len(response.data["items"]) == 1
-        assert response.data["items"][0]["quantity"] == 2
+        assert response.data["customer_name"] == "John Doe"  # nosec B101
+        assert response.data["customer_email"] == "john@example.com"  # nosec B101
+        assert response.data["customer_phone"] == "+1234567890"  # nosec B101
+        assert len(response.data["items"]) == 1  # nosec B101
+        assert response.data["items"][0]["quantity"] == 2  # nosec B101
 
         # Check that the stock quantity was updated
         stock_item.refresh_from_db()
-        assert stock_item.quantity == 98  # 100 - 2
+        assert stock_item.quantity == 98  # 100 - 2  # nosec B101
 
     def test_create_sale_insufficient_stock(
         self, authenticated_client: APIClient, product_data: tuple[Product, StockItem]
@@ -97,12 +99,12 @@ class TestSaleViewSet:
         response = authenticated_client.post(url, data, format="json")
 
         # Check that the response is a bad request
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "error" in response.data
+        assert response.status_code == status.HTTP_400_BAD_REQUEST  # nosec B101
+        assert "error" in response.data  # nosec B101
 
         # Check that the stock quantity was not updated
         stock_item.refresh_from_db()
-        assert stock_item.quantity == 100  # Unchanged
+        assert stock_item.quantity == 100  # Unchanged  # nosec B101
 
     def test_create_sale_invalid_data(self, authenticated_client: APIClient) -> None:
         """Test sale creation with invalid data."""
@@ -116,7 +118,7 @@ class TestSaleViewSet:
         response = authenticated_client.post(url, data, format="json")
 
         # Check that the response is a bad request
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_400_BAD_REQUEST  # nosec B101
 
     def test_create_sale_unauthenticated(
         self, api_client: APIClient, product_data: tuple[Product, StockItem]
@@ -135,4 +137,4 @@ class TestSaleViewSet:
         response = api_client.post(url, data, format="json")
 
         # Check that the response is unauthorized
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED  # nosec B101

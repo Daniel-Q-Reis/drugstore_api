@@ -28,13 +28,13 @@ class TestProductModels:
         )
 
     def test_brand_str(self) -> None:
-        assert str(self.brand) == "Test Brand"
+        assert str(self.brand) == "Test Brand"  # nosec B101
 
     def test_category_str(self) -> None:
-        assert str(self.category) == "Test Category"
+        assert str(self.category) == "Test Category"  # nosec B101
 
     def test_product_str(self) -> None:
-        assert str(self.product) == "Test Product (TEST001)"
+        assert str(self.product) == "Test Product (TEST001)"  # nosec B101
 
     def test_stock_item_str(self) -> None:
         stock_item = StockItem.objects.create(
@@ -45,7 +45,7 @@ class TestProductModels:
             selling_price=15.00,
             expiration_date=timezone.now().date() + relativedelta(months=7),
         )
-        assert str(stock_item) == "Test Product - BATCH001"
+        assert str(stock_item) == "Test Product - BATCH001"  # nosec B101
 
     @pytest.mark.parametrize(
         "months_ahead,expected_discount,description",
@@ -68,7 +68,7 @@ class TestProductModels:
             selling_price=15.00,
             expiration_date=expiration_date,
         )
-        assert stock_item.discount_percentage == expected_discount
+        assert stock_item.discount_percentage == expected_discount  # nosec B101
 
     def test_discounted_price(self) -> None:
         # Expires in 1 month (35% discount)
@@ -82,4 +82,4 @@ class TestProductModels:
             expiration_date=expiration_date,
         )
         # 35% of 15.00 = 5.25, so discounted price = 15.00 - 5.25 = 9.75
-        assert stock_item.discounted_price == Decimal("9.75")
+        assert stock_item.discounted_price == Decimal("9.75")  # nosec B101
