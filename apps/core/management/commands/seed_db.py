@@ -123,8 +123,8 @@ class Command(BaseCommand):
                 items_data.append(
                     {
                         "stock_item_id": stock_item.id,
-                        "quantity": random.randint(1, 5),
-                    }  # nosec B311
+                        "quantity": random.randint(1, 5),  # nosec B311
+                    }
                 )
 
             try:
