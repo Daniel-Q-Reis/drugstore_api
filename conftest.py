@@ -1,47 +1,51 @@
 import pytest
-
-from apps.products.factories.factories import (
-    BrandFactory,
-    CategoryFactory,
-    ProductFactory,
-    StockItemFactory,
-)
-from apps.sales.factories.factories import SaleFactory, SaleItemFactory, UserFactory
-from apps.users.models import User
-from apps.products.models import Brand, Category, Product, StockItem
-from apps.sales.models import Sale, SaleItem
+from typing import Any
 
 
 @pytest.fixture
-def user() -> User:
-    return UserFactory()  # type: ignore[return-value]
+def user() -> Any:
+    from apps.sales.factories.factories import UserFactory
+
+    return UserFactory()
 
 
 @pytest.fixture
-def brand() -> Brand:
-    return BrandFactory()  # type: ignore[return-value]
+def brand() -> Any:
+    from apps.products.factories.factories import BrandFactory
+
+    return BrandFactory()
 
 
 @pytest.fixture
-def category() -> Category:
-    return CategoryFactory()  # type: ignore[return-value]
+def category() -> Any:
+    from apps.products.factories.factories import CategoryFactory
+
+    return CategoryFactory()
 
 
 @pytest.fixture
-def product(brand: Brand, category: Category) -> Product:
-    return ProductFactory(brand=brand, category=category)  # type: ignore[return-value]
+def product(brand: Any, category: Any) -> Any:
+    from apps.products.factories.factories import ProductFactory
+
+    return ProductFactory(brand=brand, category=category)
 
 
 @pytest.fixture
-def stock_item(product: Product) -> StockItem:
-    return StockItemFactory(product=product)  # type: ignore[return-value]
+def stock_item(product: Any) -> Any:
+    from apps.products.factories.factories import StockItemFactory
+
+    return StockItemFactory(product=product)
 
 
 @pytest.fixture
-def sale(user: User) -> Sale:
-    return SaleFactory(created_by=user)  # type: ignore[return-value]
+def sale(user: Any) -> Any:
+    from apps.sales.factories.factories import SaleFactory
+
+    return SaleFactory(created_by=user)
 
 
 @pytest.fixture
-def sale_item(sale: Sale, stock_item: StockItem) -> SaleItem:
-    return SaleItemFactory(sale=sale, stock_item=stock_item)  # type: ignore[return-value]
+def sale_item(sale: Any, stock_item: Any) -> Any:
+    from apps.sales.factories.factories import SaleItemFactory
+
+    return SaleItemFactory(sale=sale, stock_item=stock_item)
