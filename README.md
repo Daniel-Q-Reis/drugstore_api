@@ -139,7 +139,7 @@ The test suite is designed to be run inside the Docker container to ensure a con
     *You can then open the `htmlcov/index.html` file in your browser to view the interactive report.*
 
 ---
-**Note for Local Development (Advanced):** If you are running a local PostgreSQL server (not in Docker) and have activated the local virtual environment (`venv`), you must first switch your settings to point to `localhost`. Run the script `scripts\use_local_settings.bat` (Windows) or `scripts/use_local_settings.sh` (Unix/Linux) before running `pytest`.
+**Note for Local Development (Advanced):** If you are running a local PostgreSQL server (not in Docker) and have activated the local virtual environment (`venv`), you must first switch your settings to point to `localhost`. Run the script `scripts\use_local_settings.bat` (Windows) or `scripts/use_local_settings.sh` (Unix/Linux) before running `pytest`
 
 Code Quality Checks
 The project uses pre-commit to automate quality checks before every commit. To run all checks manually across the entire codebase:
