@@ -30,7 +30,7 @@ A comprehensive pharmacy management system API built with Django REST Framework,
 
 ---
 
-## 🚀 Getting Started with Docker
+## Getting Started with Docker
 
 This is the recommended method for running the project, as it provides a consistent environment.
 
@@ -114,8 +114,7 @@ To shut down the services, run: `docker-compose down`. For a clean shutdown that
 
 ---
 
-```markdown
-### 🧪 Testing & Code Quality
+###  Testing & Code Quality
 
 This project is configured with a strict set of quality gates to ensure code is reliable and maintainable.
 
