@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {# This script tag acts as the bridge, making our backend data available to the frontend JavaScript. #}
+    <script id="stock_items_json" type="application/json">{{ stock_items_json|safe }}</script>
+    {# This line loads our custom JavaScript file. #}
+    <script src="{% static 'admin/js/sales_admin.js' %}" defer></script>
+{% endblock %}
