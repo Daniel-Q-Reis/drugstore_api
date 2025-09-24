@@ -114,22 +114,33 @@ To shut down the services, run: `docker-compose down`. For a clean shutdown that
 
 ---
 
-## 🧪 Testing & Code Quality
+```markdown
+### 🧪 Testing & Code Quality
 
 This project is configured with a strict set of quality gates to ensure code is reliable and maintainable.
 
-### Running Tests
+#### Running Tests
 
-Execute the entire test suite with `pytest`:
+The test suite is designed to be run inside the Docker container to ensure a consistent environment with access to the database.
 
-```bash
-pytest
-```
-To generate a detailed coverage report in HTML format:
+1.  **Ensure your Docker containers are running:**
+    ```bash
+    docker-compose up -d
+    ```
 
-```bash
-pytest --cov=. --cov-report=html
-```
+2.  **Execute the test suite:**
+    ```bash
+    docker-compose exec app pytest
+    ```
+
+3.  **To generate a detailed coverage report:**
+    ```bash
+    docker-compose exec app pytest --cov=. --cov-report=html
+    ```
+    *You can then open the `htmlcov/index.html` file in your browser to view the interactive report.*
+
+---
+**Note for Local Development (Advanced):** If you are running a local PostgreSQL server (not in Docker) and have activated the local virtual environment (`venv`), you must first switch your settings to point to `localhost`. Run the script `scripts\use_local_settings.bat` (Windows) or `scripts/use_local_settings.sh` (Unix/Linux) before running `pytest`.
 
 Code Quality Checks
 The project uses pre-commit to automate quality checks before every commit. To run all checks manually across the entire codebase:
