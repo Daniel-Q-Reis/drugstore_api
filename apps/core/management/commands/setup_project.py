@@ -76,15 +76,15 @@ class Command(BaseCommand):
                 call_command(
                     "seed_db",
                     "--brands",
-                    20,
-                    "--categories",
-                    30,
-                    "--products",
-                    100,
-                    "--stock-items",
-                    200,
-                    "--sales",
                     50,
+                    "--categories",
+                    50,
+                    "--products",
+                    200,
+                    "--stock-items",
+                    400,
+                    "--sales",
+                    450,
                 )
                 self.stdout.write(self.style.SUCCESS("Database seeded successfully."))
             except Exception as e:

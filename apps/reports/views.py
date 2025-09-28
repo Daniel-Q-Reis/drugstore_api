@@ -1,24 +1,129 @@
+from decimal import Decimal
 from typing import Any, Dict
+
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.db.models import Sum
+from django.db.models.functions import TruncMonth
+from django.http import HttpRequest, JsonResponse
 from django.utils import timezone
-from django.http import HttpRequest
 
 from dateutil.relativedelta import relativedelta
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from decimal import Decimal
 
 from apps.products.models import StockItem
 from apps.products.services import get_expiring_products, get_low_stock_products
+from apps.sales.models import Sale, SaleItem
 from apps.sales.services import get_sales_report
+
+
+@staff_member_required
+def dashboard_data(request: HttpRequest) -> JsonResponse:
+    today = timezone.now().date()
+    current_month_start = today.replace(day=1)
+    thirty_days_ago = today - relativedelta(days=30)
+    six_months_ago = current_month_start - relativedelta(months=5)
+
+    # --- KPI Card Data ---
+    sales_today = Sale.objects.filter(created_at__date=today)
+    sales_this_month = Sale.objects.filter(created_at__gte=current_month_start)
+    revenue_today = sales_today.aggregate(total=Sum("final_amount"))[
+        "total"
+    ] or Decimal("0.00")
+    revenue_this_month = sales_this_month.aggregate(total=Sum("final_amount"))[
+        "total"
+    ] or Decimal("0.00")
+    sales_count_today = sales_today.count()
+    new_customers_this_month = (
+        Sale.objects.filter(created_at__gte=current_month_start)
+        .values("customer_email")
+        .distinct()
+        .count()
+    )
+
+    # --- Chart Data ---
+    # Monthly sales
+    monthly_sales_data = (
+        Sale.objects.filter(created_at__gte=six_months_ago)
+        .annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(total_revenue=Sum("final_amount"))
+        .order_by("month")
+    )
+    sales_labels = [d["month"].strftime("%b %Y") for d in monthly_sales_data]
+    sales_values = [str(d["total_revenue"] or 0) for d in monthly_sales_data]
+
+    # Top 5 Products by Revenue (Last 30 Days) + "Others"
+    items_last_30_days = SaleItem.objects.filter(
+        sale__created_at__date__gte=thirty_days_ago
+    )
+    total_revenue_last_30_days = items_last_30_days.aggregate(total=Sum("total_price"))[
+        "total"
+    ] or Decimal("0.00")
+
+    top_5_revenue = (
+        items_last_30_days.select_related("stock_item__product")
+        .values("stock_item__product__name")
+        .annotate(total_revenue=Sum("total_price"))
+        .order_by("-total_revenue")[:5]
+    )
+
+    top_5_revenue_list = list(top_5_revenue)
+    top_5_revenue_sum = sum(item["total_revenue"] for item in top_5_revenue_list)
+    others_revenue = total_revenue_last_30_days - top_5_revenue_sum
+
+    revenue_labels = [item["stock_item__product__name"] for item in top_5_revenue_list]
+    revenue_values = [str(item["total_revenue"]) for item in top_5_revenue_list]
+    if others_revenue > 0:
+        revenue_labels.append("Others")
+        revenue_values.append(str(others_revenue))
+
+    # Top 5 products by quantity (Last 30 Days)
+    top_products_quantity = (
+        items_last_30_days.select_related("stock_item__product")
+        .values("stock_item__product__name")
+        .annotate(total_quantity=Sum("quantity"))
+        .order_by("-total_quantity")[:5]
+    )
+    quantity_labels = [
+        item["stock_item__product__name"] for item in top_products_quantity
+    ]
+    quantity_values = [item["total_quantity"] or 0 for item in top_products_quantity]
+
+    data = {
+        "kpi": {
+            "revenue_today": f"$ {revenue_today:,.2f}",
+            "revenue_this_month": f"$ {revenue_this_month:,.2f}",
+            "sales_today": sales_count_today,
+            "new_customers_this_month": new_customers_this_month,
+        },
+        "charts": {
+            "monthly_sales": {"labels": sales_labels, "values": sales_values},
+            "top_products_revenue": {
+                "labels": revenue_labels,
+                "values": revenue_values,
+                "total": str(total_revenue_last_30_days),
+            },
+            "top_products_quantity": {
+                "labels": quantity_labels,
+                "values": quantity_values,
+            },
+        },
+    }
+    return JsonResponse(data)
+
+
+# --- Existing API views below, now refactored for precision ---
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def inventory_summary(request: HttpRequest) -> Response:
-    """Get a summary of the current inventory."""
+    """
+    Get a summary of the current inventory status.
+    """
     total_products = StockItem.objects.count()
     total_quantity = StockItem.objects.aggregate(total=Sum("quantity"))["total"] or 0
 
@@ -38,8 +143,9 @@ def inventory_summary(request: HttpRequest) -> Response:
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def sales_summary(request: HttpRequest) -> Response:
-    """Get a summary of sales."""
-    # Get date range from query parameters or default to last 30 days
+    """
+    Get a summary of sales, defaulting to the last 30 days.
+    """
     days = int(request.query_params.get("days", 30))  # type: ignore[attr-defined]
     start_date = timezone.now().date() - relativedelta(days=days)
 
@@ -51,8 +157,10 @@ def sales_summary(request: HttpRequest) -> Response:
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def inventory_value(request: HttpRequest) -> Response:
-    """Calculate the total value of inventory."""
-    # Try to get cached result
+    """
+    Calculate the total value of inventory based on cost and selling price.
+    Results are cached for 1 hour to improve performance.
+    """
     cache_key = "inventory_value"
     cached_result = cache.get(cache_key)
 
@@ -61,20 +169,22 @@ def inventory_value(request: HttpRequest) -> Response:
 
     stock_items = StockItem.objects.all()
 
-    total_cost_value: Decimal = Decimal("0")
-    total_selling_value: Decimal = Decimal("0")
+    total_cost_value = Decimal("0")
+    total_selling_value = Decimal("0")
 
-    for item in stock_items:
+    # Use iterator() for memory efficiency on large datasets.
+    for item in stock_items.iterator():
         total_cost_value += item.cost_price * item.quantity
         total_selling_value += item.selling_price * item.quantity
 
+    # Convert final Decimal values to strings for the API response.
     result: Dict[str, Any] = {
-        "total_cost_value": float(total_cost_value),
-        "total_selling_value": float(total_selling_value),
-        "potential_profit": float(total_selling_value - total_cost_value),
+        "total_cost_value": str(total_cost_value),
+        "total_selling_value": str(total_selling_value),
+        "potential_profit": str(total_selling_value - total_cost_value),
     }
 
-    # Cache for 1 hour
+    # Cache for 1 hour (3600 seconds).
     cache.set(cache_key, result, 3600)
 
     return Response(result)
