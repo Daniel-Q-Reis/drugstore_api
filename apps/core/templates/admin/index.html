@@ -6,6 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'admin/js/dashboard.js' %}" defer></script>
     <style>
+        /* Estilos foram mantidos como antes para o layout */
         #content { width: 100%; overflow-x: hidden; }
         #content-main { float: none; width: 100%; }
         
@@ -34,7 +35,6 @@
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: default;
         }
         .kpi-card:hover {
             transform: translateY(-2px);
@@ -60,7 +60,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             overflow: hidden;
-            position: relative;
         }
         .chart-container:hover {
             transform: translateY(-2px);
@@ -80,52 +79,18 @@
             width: 100% !important;
         }
 
-        .chart-grid .chart-container:first-child {
-            grid-row: 1 / 3;
-        }
-
-        .chart-grid .chart-container:first-child canvas {
-            max-height: 100% !important;
-        }
-
-        /* Loading indicator */
-        .chart-loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #79aec8;
-            font-size: 14px;
-            display: none;
-        }
-
-        .chart-container.loading .chart-loading {
-            display: block;
-        }
-
-        .chart-container.loading canvas {
-            opacity: 0.3;
-        }
+        .chart-grid .chart-container:first-child { grid-row: 1 / 3; }
+        .chart-grid .chart-container:first-child canvas { max-height: 100% !important; }
 
         @media (max-width: 1400px) {
             .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .chart-grid { 
-                grid-template-columns: 1fr 1fr;
-                max-height: calc(100vh - 340px);
-            }
+            .chart-grid { grid-template-columns: 1fr 1fr; max-height: calc(100vh - 340px); }
             .chart-grid .chart-container:first-child { grid-row: auto; }
         }
 
         @media (max-width: 1024px) {
-            .dashboard-container {
-                max-height: none;
-                padding: 16px;
-            }
-            .chart-grid { 
-                grid-template-columns: 1fr;
-                max-height: none;
-                min-height: auto;
-            }
+            .dashboard-container { max-height: none; padding: 16px; }
+            .chart-grid { grid-template-columns: 1fr; max-height: none; min-height: auto; }
         }
 
         * { box-sizing: border-box; }
@@ -138,117 +103,43 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <h3>Today's Revenue</h3>
-            <p id="kpi-revenue-today">$ 0.00</p>
+<div id="content-main">
+    <div class="dashboard-container">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <h3>Today's Revenue</h3>
+                <p id="kpi-revenue-today">$ 0.00</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Sales Today</h3>
+                <p id="kpi-sales-today">0</p>
+            </div>
+            <div class="kpi-card">
+                <h3>This Month's Revenue</h3>
+                <p id="kpi-revenue-month">$ 0.00</p>
+            </div>
+            <div class="kpi-card">
+                <h3>New Customers This Month</h3>
+                <p id="kpi-new-customers">0</p>
+            </div>
         </div>
-        <div class="kpi-card">
-            <h3>Sales Today</h3>
-            <p id="kpi-sales-today">0</p>
-        </div>
-        <div class="kpi-card">
-            <h3>This Month's Revenue</h3>
-            <p id="kpi-revenue-month">$ 0.00</p>
-        </div>
-        <div class="kpi-card">
-            <h3>New Customers This Month</h3>
-            <p id="kpi-new-customers">0</p>
-        </div>
-    </div>
-
-    <div class="chart-grid">
-        <div class="chart-container loading">
-            <h2>Monthly Sales (Last 6 Months)</h2>
-            <div class="chart-loading">Loading chart...</div>
-            <canvas id="monthlySalesChart"></canvas>
-        </div>
-        <div class="chart-container loading">
-            <h2>Top 5 Products by Revenue (Last 30 Days)</h2>
-            <div class="chart-loading">Loading chart...</div>
-            <canvas id="topProductsRevenueChart"></canvas>
-        </div>
-        <div class="chart-container loading">
-            <h2>Top 5 Products by Quantity Sold (Last 30 Days)</h2>
-            <div class="chart-loading">Loading chart...</div>
-            <canvas id="topProductsQuantityChart"></canvas>
+    
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h2>Monthly Sales (Last 6 Months)</h2>
+                <canvas id="monthlySalesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Top 5 Products by Revenue (Last 30 Days)</h2>
+                <canvas id="topProductsRevenueChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Top 5 Products by Quantity Sold (Last 30 Days)</h2>
+                <canvas id="topProductsQuantityChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
-
-<script>
-// Enhanced Chart.js defaults for modern look and better interactivity
-Chart.defaults.color = '#ccc';
-Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
-Chart.defaults.backgroundColor = 'rgba(121, 174, 200, 0.8)';
-
-// Global chart options for enhanced hover effects and tooltips
-Chart.defaults.plugins.tooltip = {
-    enabled: true,
-    backgroundColor: 'rgba(43, 43, 43, 0.95)',
-    titleColor: '#79aec8',
-    bodyColor: '#fff',
-    borderColor: '#79aec8',
-    borderWidth: 1,
-    cornerRadius: 8,
-    displayColors: true,
-    padding: 12,
-    titleFont: {
-        size: 14,
-        weight: 'bold'
-    },
-    bodyFont: {
-        size: 13
-    },
-    footerFont: {
-        size: 11
-    }
-};
-
-Chart.defaults.plugins.legend = {
-    labels: {
-        usePointStyle: true,
-        padding: 20,
-        color: '#ccc'
-    }
-};
-
-// Enhanced interaction settings
-Chart.defaults.interaction = {
-    intersect: false,
-    mode: 'nearest'
-};
-
-// Smooth animations
-Chart.defaults.animation = {
-    duration: 1200,
-    easing: 'easeInOutQuart'
-};
-
-// Hover animations
-Chart.defaults.transitions = {
-    active: {
-        animation: {
-            duration: 300
-        }
-    }
-};
-
-// Global responsive settings
-Chart.defaults.responsive = true;
-Chart.defaults.maintainAspectRatio = false;
-
-// Add event listener to remove loading state when charts are created
-document.addEventListener('DOMContentLoaded', function() {
-    // Remove loading class from all chart containers after a delay
-    setTimeout(() => {
-        document.querySelectorAll('.chart-container.loading').forEach(container => {
-            container.classList.remove('loading');
-        });
-    }, 1500);
-});
-</script>
 {% endblock %}
 
 {% block sidebar %}{% endblock %}

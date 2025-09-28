@@ -21,14 +21,22 @@ from apps.sales.services import get_sales_report
 
 @staff_member_required
 def dashboard_data(request: HttpRequest) -> JsonResponse:
+    """
+    Provides data for the admin dashboard, following best practices for monetary values.
+
+    This view performs all calculations using Python's `Decimal` type for accuracy.
+    Final `Decimal` values are converted to strings in the JSON payload to prevent
+    any loss of precision during JavaScript parsing.
+    """
     today = timezone.now().date()
     current_month_start = today.replace(day=1)
     thirty_days_ago = today - relativedelta(days=30)
     six_months_ago = current_month_start - relativedelta(months=5)
 
-    # --- KPI Card Data ---
+    # --- KPI Card Data (Calculated with Decimal) ---
     sales_today = Sale.objects.filter(created_at__date=today)
     sales_this_month = Sale.objects.filter(created_at__gte=current_month_start)
+
     revenue_today = sales_today.aggregate(total=Sum("final_amount"))[
         "total"
     ] or Decimal("0.00")
@@ -43,7 +51,7 @@ def dashboard_data(request: HttpRequest) -> JsonResponse:
         .count()
     )
 
-    # --- Chart Data ---
+    # --- Chart Data (Calculated with Decimal) ---
     # Monthly sales
     monthly_sales_data = (
         Sale.objects.filter(created_at__gte=six_months_ago)
@@ -53,9 +61,9 @@ def dashboard_data(request: HttpRequest) -> JsonResponse:
         .order_by("month")
     )
     sales_labels = [d["month"].strftime("%b %Y") for d in monthly_sales_data]
-    sales_values = [str(d["total_revenue"] or 0) for d in monthly_sales_data]
+    sales_values = [d["total_revenue"] or Decimal("0.00") for d in monthly_sales_data]
 
-    # Top 5 Products by Revenue (Last 30 Days) + "Others"
+    # Top 5 Products by Revenue
     items_last_30_days = SaleItem.objects.filter(
         sale__created_at__date__gte=thirty_days_ago
     )
@@ -71,16 +79,21 @@ def dashboard_data(request: HttpRequest) -> JsonResponse:
     )
 
     top_5_revenue_list = list(top_5_revenue)
-    top_5_revenue_sum = sum(item["total_revenue"] for item in top_5_revenue_list)
+    top_5_revenue_sum = sum(
+        item["total_revenue"] for item in top_5_revenue_list if item["total_revenue"]
+    )
     others_revenue = total_revenue_last_30_days - top_5_revenue_sum
 
     revenue_labels = [item["stock_item__product__name"] for item in top_5_revenue_list]
-    revenue_values = [str(item["total_revenue"]) for item in top_5_revenue_list]
+    revenue_values = [
+        item["total_revenue"] or Decimal("0.00") for item in top_5_revenue_list
+    ]
+
     if others_revenue > 0:
         revenue_labels.append("Others")
-        revenue_values.append(str(others_revenue))
+        revenue_values.append(others_revenue)
 
-    # Top 5 products by quantity (Last 30 Days)
+    # Top 5 products by quantity
     top_products_quantity = (
         items_last_30_days.select_related("stock_item__product")
         .values("stock_item__product__name")
@@ -92,18 +105,22 @@ def dashboard_data(request: HttpRequest) -> JsonResponse:
     ]
     quantity_values = [item["total_quantity"] or 0 for item in top_products_quantity]
 
+    # --- Prepare final data structure, converting all Decimals to strings ---
     data = {
         "kpi": {
-            "revenue_today": f"$ {revenue_today:,.2f}",
-            "revenue_this_month": f"$ {revenue_this_month:,.2f}",
+            "revenue_today": str(revenue_today),
+            "revenue_this_month": str(revenue_this_month),
             "sales_today": sales_count_today,
             "new_customers_this_month": new_customers_this_month,
         },
         "charts": {
-            "monthly_sales": {"labels": sales_labels, "values": sales_values},
+            "monthly_sales": {
+                "labels": sales_labels,
+                "values": [str(v) for v in sales_values],
+            },
             "top_products_revenue": {
                 "labels": revenue_labels,
-                "values": revenue_values,
+                "values": [str(v) for v in revenue_values],
                 "total": str(total_revenue_last_30_days),
             },
             "top_products_quantity": {
