@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCharts(chartsData) {
-        // --- Chart 1: Monthly Sales (WITH DEFAULT TOOLTIP) ---
+        // --- Chart 1: Monthly Sales ---
         const monthlyCtx = document.getElementById('monthlySalesChart')?.getContext('2d');
         if (monthlyCtx) {
             new Chart(monthlyCtx, {
@@ -45,14 +45,62 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 },
                 options: {
+                    responsive: true,
                     maintainAspectRatio: false,
-                    // NO CUSTOM TOOLTIP OR TICKS CALLBACKS
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#ccc',
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0,
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 20
+                        }
+                    }
                 }
             });
             console.log("DEBUG MODE: Monthly Sales Chart rendered.");
         }
 
-        // --- Chart 2: Revenue by Product (WITH DEFAULT TOOLTIP) ---
+        // --- Chart 2: Revenue by Product ---
         const revenueCtx = document.getElementById('topProductsRevenueChart')?.getContext('2d');
         if (revenueCtx) {
             new Chart(revenueCtx, {
@@ -66,14 +114,51 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 },
                 options: {
+                    responsive: true,
                     maintainAspectRatio: false,
-                    // NO CUSTOM CALLBACKS
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ccc',
+                                padding: 15,
+                                font: {
+                                    size: 11
+                                },
+                                boxWidth: 12,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => {
+                                            const value = data.datasets[0].data[i];
+                                            return {
+                                                text: label,
+                                                fillStyle: data.datasets[0].backgroundColor[i],
+                                                fontColor: '#ccc',
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 10
+                        }
+                    }
                 }
             });
             console.log("DEBUG MODE: Top Products by Revenue Chart rendered.");
         }
 
-        // --- Chart 3: Quantity by Product (WITH DEFAULT TOOLTIP) ---
+        // --- Chart 3: Quantity by Product ---
         const quantityCtx = document.getElementById('topProductsQuantityChart')?.getContext('2d');
         if (quantityCtx) {
             new Chart(quantityCtx, {
@@ -87,9 +172,57 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 },
                 options: {
+                    responsive: true,
                     maintainAspectRatio: false,
                     indexAxis: 'y',
-                    // NO CUSTOM CALLBACKS
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#ccc',
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                padding: 10,
+                                font: {
+                                    size: 11
+                                },
+                                maxRotation: 0,
+                                minRotation: 0
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 20
+                        }
+                    }
                 }
             });
             console.log("DEBUG MODE: Top Products by Quantity Chart rendered.");

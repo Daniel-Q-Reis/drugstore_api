@@ -76,12 +76,16 @@ This process will execute the `setup_project` command, which:
 #### 2. Day-to-Day Development (99% of the time)
 
 -   **To start your environment:**
+    ```bash
     -   Windows: `scripts\start_dev.bat`
     -   Unix/Linux/Mac: `./scripts/start_dev.sh`
+    ```
 
 -   **To stop your environment:**
+    ```bash
     -   Windows: `scripts\stop_dev.bat`
     -   Unix/Linux/Mac: `./scripts/stop_dev.sh`
+    ```
 
 While the environment is running with `start_dev`, any changes you make to your Python or HTML files will automatically reload the server. Just save your file and refresh your browser.
 
