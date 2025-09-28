@@ -34,6 +34,7 @@
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
         }
         .kpi-card:hover {
             transform: translateY(-2px);
@@ -59,6 +60,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             overflow: hidden;
+            position: relative;
         }
         .chart-container:hover {
             transform: translateY(-2px);
@@ -84,6 +86,25 @@
 
         .chart-grid .chart-container:first-child canvas {
             max-height: 100% !important;
+        }
+
+        /* Loading indicator */
+        .chart-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #79aec8;
+            font-size: 14px;
+            display: none;
+        }
+
+        .chart-container.loading .chart-loading {
+            display: block;
+        }
+
+        .chart-container.loading canvas {
+            opacity: 0.3;
         }
 
         @media (max-width: 1400px) {
@@ -138,29 +159,33 @@
     </div>
 
     <div class="chart-grid">
-        <div class="chart-container">
+        <div class="chart-container loading">
             <h2>Monthly Sales (Last 6 Months)</h2>
+            <div class="chart-loading">Loading chart...</div>
             <canvas id="monthlySalesChart"></canvas>
         </div>
-        <div class="chart-container">
+        <div class="chart-container loading">
             <h2>Top 5 Products by Revenue (Last 30 Days)</h2>
+            <div class="chart-loading">Loading chart...</div>
             <canvas id="topProductsRevenueChart"></canvas>
         </div>
-        <div class="chart-container">
+        <div class="chart-container loading">
             <h2>Top 5 Products by Quantity Sold (Last 30 Days)</h2>
+            <div class="chart-loading">Loading chart...</div>
             <canvas id="topProductsQuantityChart"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-// Enhanced Chart.js defaults for modern look
+// Enhanced Chart.js defaults for modern look and better interactivity
 Chart.defaults.color = '#ccc';
 Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
 Chart.defaults.backgroundColor = 'rgba(121, 174, 200, 0.8)';
 
-// Global chart options for better hover effects
+// Global chart options for enhanced hover effects and tooltips
 Chart.defaults.plugins.tooltip = {
+    enabled: true,
     backgroundColor: 'rgba(43, 43, 43, 0.95)',
     titleColor: '#79aec8',
     bodyColor: '#fff',
@@ -168,7 +193,17 @@ Chart.defaults.plugins.tooltip = {
     borderWidth: 1,
     cornerRadius: 8,
     displayColors: true,
-    padding: 12
+    padding: 12,
+    titleFont: {
+        size: 14,
+        weight: 'bold'
+    },
+    bodyFont: {
+        size: 13
+    },
+    footerFont: {
+        size: 11
+    }
 };
 
 Chart.defaults.plugins.legend = {
@@ -179,15 +214,40 @@ Chart.defaults.plugins.legend = {
     }
 };
 
+// Enhanced interaction settings
 Chart.defaults.interaction = {
     intersect: false,
-    mode: 'index'
+    mode: 'nearest'
 };
 
+// Smooth animations
 Chart.defaults.animation = {
-    duration: 1000,
+    duration: 1200,
     easing: 'easeInOutQuart'
 };
+
+// Hover animations
+Chart.defaults.transitions = {
+    active: {
+        animation: {
+            duration: 300
+        }
+    }
+};
+
+// Global responsive settings
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = false;
+
+// Add event listener to remove loading state when charts are created
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove loading class from all chart containers after a delay
+    setTimeout(() => {
+        document.querySelectorAll('.chart-container.loading').forEach(container => {
+            container.classList.remove('loading');
+        });
+    }, 1500);
+});
 </script>
 {% endblock %}
 
