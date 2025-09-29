@@ -183,5 +183,5 @@ class SaleServiceTest(TestCase):
         # Average sale value = 19.50
 
         self.assertEqual(report["total_sales"], 2)
-        self.assertEqual(report["total_revenue"], 39.0)
-        self.assertEqual(report["average_sale_value"], 19.5)
+        self.assertEqual(report["total_revenue"], "39.00")
+        self.assertEqual(report["average_sale_value"], "19.50")

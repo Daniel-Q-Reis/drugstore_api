@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Any, Dict, Optional
 
-from django.db import transaction
+from django.db import models, transaction
 
 from apps.products.models import StockItem
 from apps.users.models import User
@@ -102,23 +102,31 @@ def get_sales_report(
     Returns:
         A dictionary containing sales report data.
     """
-    sales = Sale.objects.all()
+    sales_query = Sale.objects.all()
 
     if start_date:
-        sales = sales.filter(created_at__date__gte=start_date)
+        sales_query = sales_query.filter(created_at__date__gte=start_date)
 
     if end_date:
-        sales = sales.filter(created_at__date__lte=end_date)
+        sales_query = sales_query.filter(created_at__date__lte=end_date)
 
-    total_sales = sales.count()
-    total_revenue = sum(sale.final_amount for sale in sales if sale.final_amount)
+    # Perform aggregation in the database for efficiency.
+    report_data = sales_query.aggregate(
+        total_sales=models.Count("id"),
+        total_revenue=models.Sum("final_amount"),
+    )
+
+    total_sales = report_data.get("total_sales") or 0
+    total_revenue = report_data.get("total_revenue") or Decimal("0.00")
+
+    average_sale_value = (
+        total_revenue / total_sales if total_sales > 0 else Decimal("0.00")
+    )
 
     return {
         "total_sales": total_sales,
-        "total_revenue": float(total_revenue),
-        "average_sale_value": float(total_revenue / total_sales)
-        if total_sales > 0
-        else 0,
+        "total_revenue": str(total_revenue),
+        "average_sale_value": str(average_sale_value),
         "period_start": start_date,
         "period_end": end_date,
     }
