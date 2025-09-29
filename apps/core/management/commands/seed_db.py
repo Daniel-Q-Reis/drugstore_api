@@ -115,13 +115,13 @@ class Command(BaseCommand):
         self.stdout.write("Creating brands and categories...")
         brands = [
             Brand.objects.create(name=name)
-            for name in random.sample(
+            for name in random.sample(  # nosec B311
                 brand_names, min(len(brand_names), options["brands"])
             )
         ]
         categories = [
             Category.objects.create(name=name)
-            for name in random.sample(
+            for name in random.sample(  # nosec B311
                 category_names, min(len(category_names), options["categories"])
             )
         ]
@@ -131,25 +131,27 @@ class Command(BaseCommand):
         for _ in range(options["products"]):
             product = Product.objects.create(
                 name=f"{fake.word().capitalize()} {fake.word().capitalize()}",
-                brand=random.choice(brands),
-                category=random.choice(categories),
+                brand=random.choice(brands),  # nosec B311
+                category=random.choice(categories),  # nosec B311
                 sku=fake.unique.ean13(),
             )
             products.append(product)
             for _ in range(
-                random.randint(1, options["stock_items"] // options["products"])
+                random.randint(
+                    1, options["stock_items"] // options["products"]
+                )  # nosec B311
             ):
                 expiration = timezone.now().date() + relativedelta(
-                    months=random.randint(2, 24)
+                    months=random.randint(2, 24)  # nosec B311
                 )
-                cost = Decimal(str(round(random.uniform(2.5, 80.0), 2)))
+                cost = Decimal(str(round(random.uniform(2.5, 80.0), 2)))  # nosec B311
                 StockItem.objects.create(
                     product=product,
                     batch_number=fake.unique.ean8(),
-                    quantity=random.randint(50, 500),
+                    quantity=random.randint(50, 500),  # nosec B311
                     cost_price=cost,
                     selling_price=cost
-                    * Decimal(str(round(random.uniform(1.4, 2.2), 2))),
+                    * Decimal(str(round(random.uniform(1.4, 2.2), 2))),  # nosec B311
                     expiration_date=expiration,
                 )
 
@@ -165,16 +167,18 @@ class Command(BaseCommand):
             )
         else:
             for i in range(options["sales"]):
-                sale_date = timezone.now() - timedelta(days=random.randint(0, 365))
-                num_items = random.randint(1, 4)
-                sale_stock_items = random.sample(
+                sale_date = timezone.now() - timedelta(
+                    days=random.randint(0, 365)
+                )  # nosec B311
+                num_items = random.randint(1, 4)  # nosec B311
+                sale_stock_items = random.sample(  # nosec B311
                     all_stock_items, min(num_items, len(all_stock_items))
                 )
 
                 sale_item_dtos = [
                     SaleItemDTO(
                         stock_item_id=item.id,
-                        quantity=random.randint(1, 3),
+                        quantity=random.randint(1, 3),  # nosec B311
                         unit_price=Decimal(0),
                         total_price=Decimal(0),
                         discount_percentage=Decimal(0),
