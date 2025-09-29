@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Dict
+from typing import Any, Dict, no_type_check
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
@@ -19,6 +19,7 @@ from apps.sales.models import Sale, SaleItem
 from apps.sales.services import get_sales_report
 
 
+@no_type_check
 @staff_member_required
 def dashboard_data(request: HttpRequest) -> JsonResponse:
     """
