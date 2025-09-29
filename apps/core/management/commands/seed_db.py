@@ -168,8 +168,8 @@ class Command(BaseCommand):
         else:
             for i in range(options["sales"]):
                 sale_date = timezone.now() - timedelta(
-                    days=random.randint(0, 365)
-                )  # nosec B311
+                    days=random.randint(0, 365)  # nosec B311
+                )
                 num_items = random.randint(1, 4)  # nosec B311
                 sale_stock_items = random.sample(  # nosec B311
                     all_stock_items, min(num_items, len(all_stock_items))
