@@ -20,6 +20,8 @@ flake8>=6.0,<7.0
 isort>=5.12,<6.0
 pre-commit>=3.3,<4.0
 gunicorn>=20.1,<21.0
+django-storages>=1.14,<2.0
+boto3>=1.28,<2.0
 django-filter>=23.2,<24.0
 # Type checking and security scanning tools
 ruff>=0.1,<1.0

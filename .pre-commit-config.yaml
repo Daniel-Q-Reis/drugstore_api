@@ -16,6 +16,8 @@ repos:
       - id: mypy
         args: [--strict]
         additional_dependencies:
+          - django-storages
+          - boto3-stubs
           - django-stubs
           - types-requests
           - types-PyYAML

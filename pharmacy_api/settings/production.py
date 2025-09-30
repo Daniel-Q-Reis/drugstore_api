@@ -72,3 +72,24 @@ LOGGING = {
         },
     },
 }
+
+# AWS S3 STATICFILES CONFIGURATION
+# ------------------------------------------------------------------------------
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME")
+
+# The S3 URL to be used when generating URLs for the files.
+AWS_S3_CUSTOM_DOMAIN = (
+    f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+)
+AWS_DEFAULT_ACL = "public-read"  # Allows files to be publicly readable
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",  # Cache static files for 1 day
+}
+
+# Static files settings for production
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
