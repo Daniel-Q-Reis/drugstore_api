@@ -1,0 +1,75 @@
+# docker-compose.override.yml.example (Template for local development)
+# Copy this file to 'docker-compose.override.yml' to enable local development settings.
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: pharmacy_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=pharmacy_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  celery_worker:
+    build: .
+    command: celery -A pharmacy_api worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=pharmacy_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  celery_beat:
+    build: .
+    command: celery -A pharmacy_api beat --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=pharmacy_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:

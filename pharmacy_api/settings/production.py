@@ -38,11 +38,13 @@ CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_SECONDS = 31536000
+# Read HSTS and SSL Redirect settings from .env file
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=31536000, cast=int)
 SECURE_REDIRECT_EXEMPT: List[str] = []
-SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=True, cast=bool)
 
 # Logging configuration
 LOGGING = {
@@ -85,7 +87,7 @@ AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME")
 AWS_S3_CUSTOM_DOMAIN = (
     f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
 )
-AWS_DEFAULT_ACL = "public-read"  # Allows files to be publicly readable
+AWS_DEFAULT_ACL = None
 AWS_S3_OBJECT_PARAMETERS = {
     "CacheControl": "max-age=86400",  # Cache static files for 1 day
 }
