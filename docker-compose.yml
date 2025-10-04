@@ -17,19 +17,12 @@ services:
 
   app:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
+
+    volumes: []
     ports:
       - "8000:8000"
-    environment:
-      - DB_HOST=db
-      - DB_NAME=pharmacy_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - ./.env
     depends_on:
       - db
       - redis
@@ -37,16 +30,9 @@ services:
   celery_worker:
     build: .
     command: celery -A pharmacy_api worker --loglevel=info
-    volumes:
-      - .:/app
-    environment:
-      - DB_HOST=db
-      - DB_NAME=pharmacy_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes: []
+    env_file:
+      - ./.env
     depends_on:
       - db
       - redis
@@ -54,16 +40,9 @@ services:
   celery_beat:
     build: .
     command: celery -A pharmacy_api beat --loglevel=info
-    volumes:
-      - .:/app
-    environment:
-      - DB_HOST=db
-      - DB_NAME=pharmacy_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    volumes: []
+    env_file:
+      - ./.env
     depends_on:
       - db
       - redis

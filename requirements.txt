@@ -1,32 +1,46 @@
+# requirements.txt
+
+# Core Django and DRF
 Django>=4.2,<5.0
 djangorestframework>=3.14,<4.0
 djangorestframework-simplejwt>=5.2,<6.0
 django-cors-headers>=4.0,<5.0
 drf-spectacular>=0.26,<1.0
+
+# Database and Environment
 psycopg2-binary>=2.9,<3.0
 python-decouple>=3.8,<4.0
+
+# Celery and Redis
 celery>=5.3,<6.0
 redis>=4.5,<5.0
 django-redis>=5.2,<6.0
+
+# Production and Deployment
+gunicorn>=20.1,<21.0
+django-storages>=1.14,<2.0 # Added for AWS S3 integration
+boto3>=1.28,<2.0           # AWS SDK for Python, required by django-storages
+
+# Utilities
 python-json-logger>=2.0,<3.0
+django-filter>=23.2,<24.0
+
+# Testing
 pytest>=7.3,<8.0
 pytest-django>=4.5,<5.0
 pytest-cov>=4.1,<5.0
 coverage>=7.2,<8.0
 factory-boy>=3.2,<4.0
 Faker>=18.0,<19.0
+
+# Code Quality & Linting
 black>=23.3,<24.0
-flake8>=6.0,<7.0
-isort>=5.12,<6.0
-pre-commit>=3.3,<4.0
-gunicorn>=20.1,<21.0
-django-storages>=1.14,<2.0
-boto3>=1.28,<2.0
-django-filter>=23.2,<24.0
-# Type checking and security scanning tools
 ruff>=0.1,<1.0
 mypy>=1.5,<2.0
-django-stubs>=4.2,<5.0
 bandit>=1.7,<2.0
+pre-commit>=3.3,<4.0
+
+# Type Stubs
+django-stubs>=4.2,<5.0
 types-python-dateutil>=2.8,<3.0
 djangorestframework-stubs>=1.5,<2.0
