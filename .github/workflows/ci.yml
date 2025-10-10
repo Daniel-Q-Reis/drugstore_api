@@ -75,10 +75,13 @@ jobs:
       run: mypy --strict .
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        DB_HOST: "localhost"
-        DB_NAME: "test_db"
-        DB_USER: "test_user"
-        DB_PASSWORD: "test_password"
+        DB_HOST: localhost
+        DB_NAME: test_pharmacy_db
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        REDIS_URL: redis://localhost:6379/0
+        CELERY_BROKER_URL: redis://localhost:6379/0
+        CELERY_RESULT_BACKEND: redis://localhost:6379/0
 
     - name: Run security scanning
       run: bandit -r .
