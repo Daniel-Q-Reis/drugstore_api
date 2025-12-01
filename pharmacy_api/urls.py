@@ -4,6 +4,7 @@ pharmacy_api URL Configuration
 
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -13,6 +14,7 @@ from drf_spectacular.views import (
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    path("", TemplateView.as_view(template_name="landing_page.html"), name="home"),
     path("admin/", admin.site.urls),
     path("api/v1/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path(
