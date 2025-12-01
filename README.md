@@ -8,6 +8,7 @@ A comprehensive pharmacy management system API built with Django REST Framework,
 
 This project is fully deployed on a production-ready AWS infrastructure. You can explore the live application using the links below.
 
+* **Institutional Landing Page:** **[https://danielqreis.com](https://danielqreis.com)**
 * **Admin Interface:** **[https://danielqreis.com/admin/](https://danielqreis.com/admin/)**
 * **Swagger UI API Docs:** **[https://danielqreis.com/api/v1/schema/swagger-ui/](https://danielqreis.com/api/v1/schema/swagger-ui/)**
 * **ReDoc API Docs:** **[https://danielqreis.com/api/v1/schema/redoc/](https://danielqreis.com/api/v1/schema/redoc/)**
@@ -41,6 +42,7 @@ A test user with limited permissions has been created for recruiters to explore 
 - **Automated Quality & Security**: CI/CD pipeline with GitHub Actions that runs linters (`ruff`), static type checking (`mypy --strict`), and security scanning (`bandit`).
 - **Interactive API Documentation**: Auto-generated, interactive API documentation with Swagger UI and ReDoc via `drf-spectacular`.
 - **Professional Deployment**: Deployed on AWS (EC2) with Docker, Nginx, Gunicorn, PostgreSQL, Redis, and S3 for static files, all secured with HTTPS/SSL.
+- **Institutional Landing Page**: A responsive, single-page presentation site with internationalization (English/Portuguese), served directly by Django templates.
 
 ## Tech Stack
 
@@ -142,6 +144,9 @@ If you prefer to run each step manually after setting up the `.env` and `overrid
 
 Once the application is running, the following endpoints will be available:
 
+-   **Landing Page**: `http://localhost:8000/`
+    -   *Institutional presentation page.*
+
 -   **Django Admin**: `http://localhost:8000/admin`
     -   *Login with the superuser credentials (`admin@example.com` / `admin123`)*.
 
@@ -203,12 +208,17 @@ mypy: A static type checker running in strict mode to enforce type safety.
 bandit: A security scanner to find common security vulnerabilities.
 
 
-##Project Structure
+## Project Structure
 
 ```bash
 pharmacy_api/
 ├── apps/
 │   ├── core/          # Core app with management commands
+│   │   ├── templates/
+│   │   │   ├── admin/
+│   │   │   │   └── index.html  # Custom Admin Dashboard
+│   │   │   └── landing_page.html # Institutional Landing Page
+│   │   └── ...
 │   ├── users/         # User management and authentication
 │   ├── products/      # Product and inventory management
 │   ├── sales/         # Sales and transaction management
@@ -218,7 +228,7 @@ pharmacy_api/
 └── requirements.txt   # Python dependencies
 ```
 
-##License & Contact
+## License & Contact
 
 This project is licensed under the MIT License.
 
