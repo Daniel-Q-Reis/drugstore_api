@@ -11,9 +11,9 @@
                 extend: {
                     colors: {
                         brand: {
-                            dark: '#0f172a', // Slate 900
-                            accent: '#3b82f6', // Blue 500
-                            light: '#f8fafc', // Slate 50
+                            dark: '#0f172a',
+                            accent: '#3b82f6',
+                            light: '#f8fafc',
                         }
                     },
                     fontFamily: {
@@ -29,10 +29,23 @@
         body { font-family: 'Inter', sans-serif; }
         .tech-font { font-family: 'Fira Code', monospace; }
         
-        /* Smooth fade for language switch */
+        /* Language visibility transitions */
         .lang-content { transition: opacity 0.3s ease-in-out; }
         .hidden-lang { display: none; opacity: 0; }
         .visible-lang { display: block; opacity: 1; }
+        
+        /* Layout fixes for cost boxes to prevent spacing issues */
+        .cost-box {
+            height: 100%; /* Ensures box fills height without forcing gaps */
+            display: flex;
+            flex-direction: column;
+        }
+        .cost-items {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            margin-bottom: 1rem; 
+        }
     </style>
 </head>
 <body class="bg-brand-dark text-slate-300 antialiased selection:bg-brand-accent selection:text-white">
@@ -57,9 +70,9 @@
 
     <section class="pt-32 pb-20 px-6">
         <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-brand-accent text-sm font-semibold tracking-wide uppercase">
-                <span class="lang-en hidden-lang">Available for International Contracts (B2B)</span>
-                <span class="lang-pt hidden-lang">Disponível para Contratos Internacionais (PJ)</span>
+            <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-brand-accent text-sm font-semibold tracking-wide">
+                <span class="lang-en hidden-lang">🌎 W-8BEN Certified • Tax-Free International Contracts</span>
+                <span class="lang-pt hidden-lang">🇧🇷 Empresa PJ • Contratos Corporativos no Brasil</span>
             </div>
             
             <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
@@ -166,6 +179,238 @@
         </div>
     </section>
 
+    <section class="py-20 px-6 bg-slate-900/30">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-4 text-center">
+                <span class="lang-en hidden-lang">Why Hire a W-8BEN Contractor?</span>
+                <span class="lang-pt hidden-lang">Por Que Contratar PJ?</span>
+            </h2>
+            <p class="text-slate-400 text-center mb-12 max-w-3xl mx-auto">
+                <span class="lang-en hidden-lang">
+                    Significant cost savings with zero compliance risk. Compare a $5,000/month W2 employee vs W-8BEN contractor.
+                </span>
+                <span class="lang-pt hidden-lang">
+                    Economia significativa com zero risco trabalhista. Compare um funcionário CLT de R$ 10.000/mês vs contratação PJ.
+                </span>
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="cost-box bg-brand-dark border border-red-900/50 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold text-white">
+                            <span class="lang-en hidden-lang">W2 Employee</span>
+                            <span class="lang-pt hidden-lang">Funcionário CLT</span>
+                        </h3>
+                        <span class="tech-font text-xs bg-red-900/30 text-red-300 px-3 py-1 rounded border border-red-800">
+                            <span class="lang-en hidden-lang">Higher Cost</span>
+                            <span class="lang-pt hidden-lang">Maior Custo</span>
+                        </span>
+                    </div>
+
+                    <div class="cost-items text-sm">
+                        <div class="lang-en hidden-lang space-y-2">
+                            <div class="flex justify-between text-slate-300">
+                                <span>Base Salary</span>
+                                <span class="font-semibold">$5,000</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Employer Taxes (FICA ~7.65%)</span>
+                                <span>$383</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Unemployment Insurance (~6%)</span>
+                                <span>$300</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Workers' Comp (~2%)</span>
+                                <span>$100</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Health Insurance + Benefits</span>
+                                <span>$1,000</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Paid Time Off (provision)</span>
+                                <span>$417</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Administrative Overhead</span>
+                                <span>$250</span>
+                            </div>
+                        </div>
+
+                        <div class="lang-pt hidden-lang space-y-2">
+                            <div class="flex justify-between text-slate-300">
+                                <span>Salário Base</span>
+                                <span class="font-semibold">R$ 10.000</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>INSS Patronal (20%)</span>
+                                <span>R$ 2.000</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>FGTS (8%)</span>
+                                <span>R$ 800</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>13º Salário (provisão)</span>
+                                <span>R$ 833</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Férias + 1/3 (provisão)</span>
+                                <span>R$ 1.111</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>RAT/SAT (~2%)</span>
+                                <span>R$ 200</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Benefícios (VT, VR, Plano)</span>
+                                <span>R$ 1.500</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Risco Trabalhista (provisão)</span>
+                                <span>R$ 800</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-700 pt-3 mt-auto">
+                        <div class="flex justify-between text-lg font-bold text-red-400">
+                            <span>
+                                <span class="lang-en hidden-lang">Total Monthly Cost</span>
+                                <span class="lang-pt hidden-lang">Custo Total Mensal</span>
+                            </span>
+                            <span class="lang-en hidden-lang">$7,450</span>
+                            <span class="lang-pt hidden-lang">R$ 17.244</span>
+                        </div>
+                        <div class="text-xs text-slate-500 text-right mt-1">
+                            <span class="lang-en hidden-lang">+49% over base salary</span>
+                            <span class="lang-pt hidden-lang">+72% sobre o salário base</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cost-box bg-brand-dark border border-green-900/50 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold text-white">
+                            <span class="lang-en hidden-lang">W-8BEN Contractor</span>
+                            <span class="lang-pt hidden-lang">Contratação PJ</span>
+                        </h3>
+                        <span class="tech-font text-xs bg-green-900/30 text-green-300 px-3 py-1 rounded border border-green-800">
+                            <span class="lang-en hidden-lang">Best Value</span>
+                            <span class="lang-pt hidden-lang">Melhor Custo</span>
+                        </span>
+                    </div>
+
+                    <div class="cost-items text-sm">
+                         <div class="lang-en hidden-lang space-y-2">
+                            <div class="flex justify-between text-slate-300">
+                                <span>Monthly Invoice</span>
+                                <span class="font-semibold">$5,000</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ Zero Withholding Tax (W-8BEN)</span>
+                                <span>$0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ No Employer Taxes</span>
+                                <span>$0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ No Benefits Required</span>
+                                <span>$0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ No PTO Costs</span>
+                                <span>$0</span>
+                            </div>
+                            <div class="flex justify-between text-slate-400">
+                                <span>Payment Processing</span>
+                                <span>$50</span>
+                            </div>
+                        </div>
+
+                        <div class="lang-pt hidden-lang space-y-2">
+                            <div class="flex justify-between text-slate-300">
+                                <span>Nota Fiscal Mensal</span>
+                                <span class="font-semibold">R$ 10.000</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ Sem Encargos Trabalhistas</span>
+                                <span>R$ 0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ Sem Férias e 13º</span>
+                                <span>R$ 0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ Sem FGTS e INSS Patronal</span>
+                                <span>R$ 0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ Zero Risco Trabalhista</span>
+                                <span>R$ 0</span>
+                            </div>
+                            <div class="flex justify-between text-green-400">
+                                <span>✓ Sem Rescisão ou Multas</span>
+                                <span>R$ 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-700 pt-3 mt-auto">
+                        <div class="flex justify-between text-lg font-bold text-green-400">
+                            <span>
+                                <span class="lang-en hidden-lang">Total Monthly Cost</span>
+                                <span class="lang-pt hidden-lang">Custo Total Mensal</span>
+                            </span>
+                            <span class="lang-en hidden-lang">$5,050</span>
+                            <span class="lang-pt hidden-lang">R$ 10.000</span>
+                        </div>
+                        <div class="text-xs text-green-400 text-right font-semibold mt-1">
+                            <span class="lang-en hidden-lang">SAVE $2,400/month (32%)</span>
+                            <span class="lang-pt hidden-lang">ECONOMIA R$ 7.244/mês (42%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">
+                    <span class="lang-en hidden-lang">Additional Benefits</span>
+                    <span class="lang-pt hidden-lang">Benefícios Adicionais</span>
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6 text-sm">
+                    <div>
+                        <div class="text-brand-accent font-semibold mb-2">
+                            <span class="lang-en hidden-lang">🚀 Flexibility</span>
+                            <span class="lang-pt hidden-lang">🚀 Flexibilidade</span>
+                        </div>
+                        <p class="text-slate-400 lang-en hidden-lang">Scale up or down without termination complications or severance costs.</p>
+                        <p class="text-slate-400 lang-pt hidden-lang">Escale para cima ou para baixo sem complicações de rescisão ou custos de demissão.</p>
+                    </div>
+                    <div>
+                        <div class="text-brand-accent font-semibold mb-2">
+                            <span class="lang-en hidden-lang">⚖️ Zero Legal Risk</span>
+                            <span class="lang-pt hidden-lang">⚖️ Zero Risco Legal</span>
+                        </div>
+                        <p class="text-slate-400 lang-en hidden-lang">No employment lawsuits, labor disputes, or wrongful termination claims.</p>
+                        <p class="text-slate-400 lang-pt hidden-lang">Sem processos trabalhistas, disputas ou ações de demissão indevida.</p>
+                    </div>
+                    <div>
+                        <div class="text-brand-accent font-semibold mb-2">
+                            <span class="lang-en hidden-lang">📋 Simple Compliance</span>
+                            <span class="lang-pt hidden-lang">📋 Compliance Simplificado</span>
+                        </div>
+                        <p class="text-slate-400 lang-en hidden-lang">Just invoice payments. No complex payroll, tax filings, or HR administration.</p>
+                        <p class="text-slate-400 lang-pt hidden-lang">Apenas pagamento de nota fiscal. Sem folha de pagamento complexa ou administração de RH.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="py-20 bg-slate-800/30 px-6">
         <div class="max-w-7xl mx-auto">
             <h2 class="text-3xl font-bold text-white mb-12 text-center">
@@ -232,7 +477,7 @@
             
             <div class="text-xs text-slate-600 space-y-1">
                 <p>&copy; 2025 Royal Tech. All rights reserved.</p>
-                <p>Registered Entity: Daniel de Queiroz Reis Tecnologia da Informação LTDA (CNPJ: 63.419.534/0001-77) - Minas Gerais, Brazil.</p>
+                <p>Registered Entity: Daniel de Queiroz Reis Tecnologia da Informação LTDA (CNPJ: 63.419.534/0001-77) - São Paulo, Brazil.</p>
             </div>
             
             <div class="mt-8 flex justify-center gap-6">
@@ -279,13 +524,11 @@
             setLanguage(newLang);
         }
 
-        // Auto-detect or load saved preference
         document.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('royal_tech_lang');
             if (saved) {
                 setLanguage(saved);
             } else {
-                // Detect browser language
                 const userLang = navigator.language || navigator.userLanguage; 
                 if (userLang.startsWith('pt')) {
                     setLanguage('pt');
